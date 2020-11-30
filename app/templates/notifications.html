@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block metas %}
+    {{ super() }}
+    <meta property="og:title" content="Notifications - Pukmun"/>
+    <meta property="og:description" content="Your notirications."/>
+    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('msg') }}"/>
+    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
+{% endblock %}
+
+{% block app_content %}
+    <nav aria-label="breadcrumb" class="text-uppercase">
+        <ol class="breadcrumb default-color">
+            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+            <li class="breadcrumb-item active">Notifications</li>
+        </ol>
+    </nav>
+    {% if notifications %}
+        {% if not current_user.unread_count() %}
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                        <small class="card-title">You don't have new notifications.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% for notification in notifications %}
+            {% include '_notification.html' %}
+        {% endfor %}
+        {% include '_pages_notifications.html' %}
+    {% else %}
+        <div class="row mb-3">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                    <h5 class="card-title">You don't have any notifications.</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

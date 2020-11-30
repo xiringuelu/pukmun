@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block metas %}
+    {{ super() }}
+    <meta property="og:title" content="{{ user.username }} - Pukmun"/>
+    <meta property="og:description" content="{{ clean_about_me }}"/>
+    <meta property="og:image" itemprop="image" content="{{ config['URL_BASE'] + (user.avatar_l or avatars.default(size='l')) }}"/>
+    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('user', username=user.username.lower()) }}"/>
+{% endblock %}
+
+{% block app_content %}
+    <div class="row form-group">
+        <div class="col-xs-12 col-sm-4 col-lg-3 text-center">
+            <img  class='border border-primary rounded-circle center-block img-responsive' src="{{ user.avatar_l or avatars.default(size='l') }}" width="100%">
+        </div>
+        <div class="col-xs-12 col-sm-8 col-lg-5">
+            <h3>{{ user.username }}</h3>
+            {% if user.last_seen %}<p><i class="fas fa-calendar"></i> <span class="badge badge-info">{{ user.last_seen|timeago }}</span></p>{% endif %}
+            {% if user.about_me %}{{ user.about_me|safe }}{% endif %}
+            {% if user == current_user %}
+            <p><a href="{{ url_for('edit_profile') }}" class="btn btn-success"><i class="fas fa-edit"></i> Edit your profile</a></p>
+            {% elif not current_user.is_following(user) %}
+                <p><form action="{{ url_for('follow', username=user.username) }}" method="post">
+                    {{ form.hidden_tag() }}
+                    <button class="btn btn-success" type="submit"><i class="fas fa-heart"></i> Follow</button>
+                </form></p>
+            {% else %}
+                <p><form action="{{ url_for('unfollow', username=user.username) }}" method="post">
+                    {{ form.hidden_tag() }}
+                    <button class="btn btn-danger" type="submit"><i class="fas fa-heart-broken"></i> Unfollow</button>
+                </form></p>
+            {% endif %}
+        </div>
+        <div class="col-xs-12 col-sm-12 col-lg-4">
+                <p><span class="badge badge-primary">Followers</span> <span class="badge badge-secondary">{{ user.followers.count() }}</span>
+                </p><p>
+                {% for follower in user.followers %}
+                <a data-toggle="tooltip" title="{{ follower.username }}" href="{{ url_for('user', username=follower.username.lower()) }}"><img  class='border border-primary rounded-circle' src="{{ follower.avatar_s or avatars.default(size='s') }}" width="30px"></a>
+                {% endfor %}
+                </p>
+                <p><span class="badge badge-primary">Following</span> <span class="badge badge-secondary">{{ user.followed.count() }}</span>
+                </p><p>
+                {% for followed in user.followed %}
+                <a data-toggle="tooltip" title="{{ followed.username }}" href="{{ url_for('user', username=followed.username.lower()) }}"><img  class='border border-primary rounded-circle' src="{{ followed.avatar_s or avatars.default(size='s') }}" width="30px"></a>
+                {% endfor %}
+                </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3>User recipes</h3>
+        </div>
+    </div>
+    <hr>
+    {% for recipe in recipes %}
+        {% include '_recipe_user.html' %}
+    {% endfor %}
+    {% include '_pages_recipes.html' %}
+{% endblock %}

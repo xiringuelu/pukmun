@@ -1,0 +1,18 @@
+<div class="row mb-3">
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                    <a href="{{ url_for('user', username=comment.author.username.lower()) }}">
+                        <img  class='border border-primary rounded-circle' src="{{ comment.author.avatar_s or avatars.default(size='')}}" width="30px">
+                    </a>
+                        <a class="badge badge-primary lg" href="{{ url_for('user', username=comment.author.username.lower()) }}">{{ comment.author.username }}</a>
+                    <div class="float-right">
+                        <span class="card-subtitle badge badge-info">{{ comment.timestamp|timeago }}</span>
+                    </div>
+            </div>
+            <div class="card-body">
+                {{ comment.content|safe }}
+            </div>
+        </div>
+    </div>
+</div>

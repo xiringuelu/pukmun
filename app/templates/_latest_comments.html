@@ -1,0 +1,13 @@
+<div class="row mb-1">
+    <div class="col">
+        <a data-toggle="tooltip" title="{{ comment.author.username }}" href="{{ url_for('user', username=comment.author.username.lower()) }}">
+            <img class='border border-primary rounded-circle' src="{{ comment.author.avatar_s or avatars.default(size='')}}" width="30px">
+        </a>
+        <div class="float-right">
+            <small class="card-subtitle badge badge-info">{{ comment.timestamp|timeago }}</small>
+        </div>
+        <a href="{{ url_for('recipe', recipe_name=comment.recipe.name, recipe_id=comment.recipe.id, _anchor='comments') }}">
+            <small>{{ comment.recipe.name }}</small>
+        </a>
+    </div>
+</div>

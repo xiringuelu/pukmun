@@ -1,0 +1,72 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <img style="margin-top: -10px;" src="{{ url_for('static', filename='pukmun_logo_small.png') }}"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+    
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="nav navbar-nav mr-auto">
+            <li class="nav-item{% if title == "Home" %} active{% endif %}">
+            <a class="nav-link" href="{{ url_for('index') }}"> <i class="fas fa-home"></i> Home</a>
+            </li>
+            <li class="nav-item{% if title == "Explore" %} active{% endif %}">
+            <a class="nav-link" href="{{ url_for('explore') }}"><i class="fas fa-compass"></i> Explore</a>
+            </li>
+        </ul>
+        
+        <ul class="nav navbar-nav navbar-right">
+            {% if current_user.is_anonymous %}
+                <li class="nav-item{% if title == "Sign In" %} active{% endif %}">
+                    <a class="nav-link" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                </li>
+            {% else %}
+            <li class="nav-item{% if title == "Add Recipe" %} active{% endif %}">
+                <a class="nav-link" href="{{ url_for('add_recipe') }}"><i class="fas fa-plus-circle"></i> Add Recipe</a>
+            </li>
+            <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-user"></i>
+                <span class="badge badge-primary">{{ current_user.username }}</span>
+                {% if current_user.unread_count() %}
+                    <span class="badge badge-danger">{{ current_user.unread_count() }}</span>
+                {% endif %}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{{ url_for('user', username=current_user.username.lower()) }}"><i class="fas fa-eye"></i> View Profile</a>
+                <a class="dropdown-item" href="{{ url_for('edit_profile', username=current_user.username.lower()) }}"><i class="fas fa-edit"></i> Edit Profile</a>
+                <a class="dropdown-item" href="{{ url_for('liked') }}"><i class="fas fa-heart" style="color: #d9534f;"></i> Favourites</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{{ url_for('msg') }}">
+                    <i class="fas fa-envelope"></i>
+                    Notifications
+                    {% if current_user.unread_count() %}
+                        <span class="badge badge-danger">{{ current_user.unread_count() }}</span>
+                    {% endif %}
+                </a>
+                {% if current_user.is_admin %}
+                    <a class="dropdown-item" href="{{ url_for('admin.index') }}">
+                        <i class="fas fa-wrench"></i> <span class="badge badge-danger">Admin. Panel</span>
+                    </a>
+                {% endif %}
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            </li>
+            {% endif %}
+        </ul>
+        <ul class="nav navbar-nav">
+            <form class="navbar-form navbar-right" action="/search" method="POST">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="search-addon">
+                    <div class="input-group-append">
+                      <span class="input-group-text" id="search-addon"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+            </form>
+        </ul>
+        </div>
+    </div>
+</nav>

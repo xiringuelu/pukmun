@@ -1,0 +1,11 @@
+<div class="row mb-1">
+    <div class="col">
+        <a href="{{ url_for('user', username=user.username.lower()) }}">
+            <img  class='border border-primary rounded-circle' src="{{ user.avatar_s or avatars.default(size='s')}}" width="30px">
+        </a>
+            <a class="badge badge-primary" href="{{ url_for('user', username=user.username.lower()) }}">{{ user.username }}</a>
+        <div class="float-right">
+            <small class="card-subtitle badge badge-info">{{ user.recipes.count() }} recipes</small>
+        </div>
+    </div>
+</div>

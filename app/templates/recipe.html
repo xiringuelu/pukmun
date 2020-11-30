@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block metas %}
+    {{ super() }}
+    <meta property="og:title" content="{{ recipe.name }} - Pukmun"/>
+    <meta property="og:description" content="{{ clean_desc }}"/>
+    <meta property="og:image" itemprop="image" content="{{ config['URL_BASE'] + url_for('get_img', filename=recipe.image) }}"/>
+    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('recipe', recipe_name=recipe.urlify(), recipe_id=recipe.id) }}"/>
+{% endblock %}
+
+{% block app_content %}
+            <div class="row">
+                <div class="col">
+                    <img class="img-fluid rounded center-block w-100" src="{{ url_for('get_img', filename=recipe.image) }}">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col">
+                    <h3>{{ recipe.name }}</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <a href="{{ url_for('user', username=recipe.author.username.lower()) }}">
+                        <img  class='border border-primary rounded-circle' src="{{ recipe.author.avatar_s or avatars.default(size='s')}}" width="30px">
+                    </a>
+                    <a class="badge badge-primary" href="{{ url_for('user', username=recipe.author.username.lower()) }}">{{ recipe.author.username }}</a>
+                    <span  class="badge badge-info">{{ recipe.timestamp|timeago }}</span>
+                </div>
+                <div class="col-7 col-md-4">
+                    <i class="fas fa-concierge-bell"></i>
+                    <a href="{{ url_for('category', category=recipe.category.lower()) }}" class="badge badge-success">{{ recipe.category or 'Uncategorised' }}</a>
+                    <br>
+                    <i class="fas fa-tag"> </i>
+                    {% if recipe.tags %}
+                        {% for tag in recipe.tags.split(',') %}
+                            <a href="{{ url_for('tag', tag=tag.lower()) }}" class="badge badge-warning">{{tag}}</a>
+                        {% endfor %}
+                    {% else %}
+                        <span  class="badge badge-warning">Untagged</span>
+                    {% endif %}
+                </div>
+                <div class="col-5 col-md-4">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.has_liked_recipe(recipe) %}
+                            <a class="btn btn-danger" href="{{ url_for('like_action', recipe_id=recipe.id, action='unlike') }}">
+                                <i class="fas fa-heart"></i>
+                            </a>
+                        {% else %}
+                            <a class="btn btn-outline-danger" href="{{ url_for('like_action', recipe_id=recipe.id, action='like') }}">
+                                <i class="fas fa-heart"></i>
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <span data-toggle="tooltip" title="Log in to Like this recipe" class="btn btn-outline-danger disabled">
+                            <i class="fas fa-heart" style="color: #d9534f;"></i>
+                        </span>
+                    {% endif %}
+                    <span class="badge badge-danger">{{ recipe.likes.count() }} likes</span>
+                </div>
+            </div>
+            <hr>
+            <div class="row mb-3">
+                <div class="col">
+                    {{ recipe.description|safe }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4"><h5><i class="fas fa-shopping-basket"></i> Ingredients <span class="badge badge-secondary">{{ recipe.serves or 'Undefined' }} <i class="fas fa-utensils"></i></span></h5>{{ recipe.ingredients|safe }}</div>
+                <div class="col-md-8"><h5><i class="fas fa-list"></i> Preparation</h5>{{ recipe.steps|safe }}</div>
+            </div>
+            
+            {% if current_user.is_authenticated %}
+                <div class="row mb-3" id="comments">
+                    <div class="col">
+                        <h5><i class="fas fa-comments"></i> Comments <span class="badge badge-secondary">{{ recipe.comments.count() }}</span></h5>
+                    </div>
+                </div>
+                {% if comments %}
+                    {% for comment in comments %}
+                        {% include '_comment.html' %}
+                    {% endfor %}
+                    {% include '_pages_comments.html' %}
+                {% else %}
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-body">
+                                <h5 class="card-title">No comments yet.</h5>
+                                <h6 class="card-subtitle text-muted">Be the first one to comment!</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="row">
+                    <div class="col">
+                        <h5><i class="fas fa-pencil-alt"></i> Write a comment</h5>
+                        {{ render_form(form) }}
+                    </div>
+                </div>
+            {% else %}
+            <div class="row" id="comments">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                        <h5 class="card-title">Annonymous users can't see or write comments</h5>
+                        <h6 class="card-subtitle text-muted"><a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">Register</a> </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ ckeditor.load() }}
+{% endblock %}

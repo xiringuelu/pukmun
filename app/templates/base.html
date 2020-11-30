@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        {% block head %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="apple-touch-icon-precomposed" sizes="57x57" href="{{ url_for('static', filename='apple-touch-icon-57x57.png') }}" />
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ url_for('static', filename='apple-touch-icon-114x114.png') }}" />
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ url_for('static', filename='apple-touch-icon-72x72.png') }}" />
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ url_for('static', filename='apple-touch-icon-144x144.png') }}" />
+        <link rel="apple-touch-icon-precomposed" sizes="60x60" href="{{ url_for('static', filename='apple-touch-icon-60x60.png') }}" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="{{ url_for('static', filename='apple-touch-icon-120x120.png') }}" />
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="{{ url_for('static', filename='apple-touch-icon-76x76.png') }}" />
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="{{ url_for('static', filename='apple-touch-icon-152x152.png') }}" />
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-196x196.png') }}" sizes="196x196" />
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}" sizes="32x32" />
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-16x16.png') }}" sizes="16x16" />
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-128.png') }}" sizes="128x128" />
+        <meta name="application-name" content="Pukmun"/>
+        <meta name="msapplication-TileColor" content="#FFFFFF" />
+        <meta name="msapplication-TileImage" content="{{ url_for('static', filename='mstile-144x144.png') }}" />
+        <meta name="msapplication-square70x70logo" content="{{ url_for('static', filename='mstile-70x70.png') }}" />
+        <meta name="msapplication-square150x150logo" content="{{ url_for('static', filename='mstile-150x150.png') }}" />
+        <meta name="msapplication-wide310x150logo" content="{{ url_for('static', filename='mstile-310x150.png') }}" />
+        <meta name="msapplication-square310x310logo" content="{{ url_for('static', filename='mstile-310x310.png') }}" />
+        
+        {% block metas %}
+        {% endblock %}
+
+        {% block styles %}
+            <!-- Bootstrap CSS -->
+            {{ bootstrap.load_css() }}
+            <!-- Font-Awesome CSS -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+            <!-- Custom CSS -->
+            <link rel="stylesheet" href="{{ url_for("static", filename="styles.css") }}">
+        {% endblock %}
+
+        <title>{% if title %}{{ title }} - Pukmun{% else %}Welcome to Pukmun{% endif %}</title>
+        {% endblock %}
+    </head>
+    <body>
+        <!-- NavBar -->
+        {% include '_navbar.html' %}
+        {% block content %}        
+            <div class="container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == "message" %}
+                            <div class="alert alert-warning alert-dismissible fade show">
+                        {% else %}
+                            <div class="alert {{ category }} alert-dismissible fade show">
+                        {% endif %}
+                        {{ message | safe }}
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+        
+                <!-- App Content -->
+                {% block app_content %}
+                {% endblock %}
+            </div>
+            <!-- Footer -->
+            {% include '_footer.html' %}
+
+        {% endblock %}
+
+        {% block scripts %}
+            <!-- Optional JavaScript -->
+            {{ bootstrap.load_js() }}
+            <!-- Tooltips JavaScript -->
+            <script>
+                $(document).ready(function(){
+                  $('[data-toggle="tooltip"]').tooltip();
+                });
+            </script>
+        {% endblock %}
+    </body>
+</html>

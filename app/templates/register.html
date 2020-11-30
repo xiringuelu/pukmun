@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from 'bootstrap/form.html' import render_form, render_field %}
+
+{% block app_content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Pukmun</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Register</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-md-4">
+            {{ render_form(form) }}
+        </div>
+    </div>
+    <br>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form, render_field %}
+
+{% block metas %}
+    {{ super() }}
+    <meta property="og:title" content="Log In - Pukmun"/>
+    <meta property="og:description" content="Log in or register an account."/>
+    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}""/>
+    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('login') }}"/>
+{% endblock %}
+
+{% block app_content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Pukmun</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Sign In</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-md-4">
+            {{ render_form(form) }}
+        </div>
+    </div>
+    <br>
+    <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
+    <p>
+        Forgot Your Password?
+        <a href="{{ url_for('reset_password_request') }}">Click to Reset It</a>
+    </p>
+{% endblock %}

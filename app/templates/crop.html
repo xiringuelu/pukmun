@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from 'bootstrap/form.html' import render_form, render_field %}
+
+{% block styles %}
+{{super()}}
+{{ avatars.jcrop_css() }} 
+{% endblock %}
+{% block app_content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Pukmun</a></li>
+        <li class="breadcrumb-item" aria-current="page">Upload Avatar</li>
+        <li class="breadcrumb-item active" aria-current="page">Crop Image</li>
+        </ol>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                {{ avatars.crop_box('get_avatar', session['raw_filename']) }}<br>
+                {{ render_form(form) }}
+            </div>
+        </div>
+    </div>
+    {{ avatars.jcrop_js() }}  
+    {{ avatars.init_jcrop() }} 
+{% endblock %}

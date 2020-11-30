@@ -1,0 +1,25 @@
+<div class="col-md-6 col-lg-12">
+    <div class="card border-primary mb-3">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-users"></i> Our Heroes
+        </div>
+        <div class="card-body">
+            {% for user in top_users %}
+                {% include '_top_users.html' %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 col-lg-12">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-comments"></i> Latest Comments
+        </div>
+        <div class="card-body">
+            {% for comment in comments %}
+                {% include '_latest_comments.html' %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
