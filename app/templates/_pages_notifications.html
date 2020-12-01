@@ -1,6 +1,6 @@
 <div class="row mb-3">
   <div class="col">
-    <a role="button" class="btn btn-primary{% if not prev_url %} disabled{% endif %} float-left" {% if not prev_url %}aria-disabled="true"{% endif %}href="{{ prev_url or '#' }}"><span aria-hidden="true">&larr;</span> Newer</a>
-    <a role="button" class="btn btn-primary{% if not next_url %} disabled{% endif %} float-right" {% if not next_url %}aria-disabled="true"{% endif %}href="{{ next_url or '#' }}">Older <span aria-hidden="true">&rarr;</span></a>  
+    <a role="button" class="btn btn-primary{% if not prev_url %} btn-outline-primary disabled{% endif %} float-left" {% if not prev_url %}aria-disabled="true"{% endif %}href="{{ prev_url or '#' }}"><span aria-hidden="true">&larr;</span> Newer</a>
+    <a role="button" class="btn btn-primary{% if not next_url %} btn-outline-primary disabled{% endif %} float-right" {% if not next_url %}aria-disabled="true"{% endif %}href="{{ next_url or '#' }}">Older <span aria-hidden="true">&rarr;</span></a>  
   </div>
 </div>
