@@ -82,17 +82,33 @@ def add_recipe():
 def index():
     if not current_user.is_authenticated:
         flash(f'Please <a class="font-weight-bold" href="{url_for("login")}">log in</a> to enjoy the full Pukmun experience', 'alert-info')
-        return render_template('index.html', title='Home')
     page = request.args.get('page', 1, type=int)
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    recipes = current_user.followed_recipes().paginate(
+    recipes = Recipe.query.filter(Recipe.approved == True).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
     next_url = url_for('index', page=recipes.next_num) \
         if recipes.has_next else None
     prev_url = url_for('index', page=recipes.prev_num) \
         if recipes.has_prev else None
-    return render_template('index.html', title='Home',
+    return render_template("index.html", title='Home', recipes=recipes.items,
+                          next_url=next_url, prev_url=prev_url,
+                          comments=latest_comments, top_users=top_users)
+
+
+@app.route('/cookbook', methods=['GET'])
+@login_required
+def cookbook():
+    page = request.args.get('page', 1, type=int)
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
+    recipes = current_user.followed_recipes().paginate(
+        page, app.config['RECIPES_PER_PAGE'], False)
+    next_url = url_for('cookbook', page=recipes.next_num) \
+        if recipes.has_next else None
+    prev_url = url_for('cookbook', page=recipes.prev_num) \
+        if recipes.has_prev else None
+    return render_template('cookbook.html', title='Cookbook',
                            recipes=recipes.items, next_url=next_url,
                            prev_url=prev_url, comments=latest_comments, top_users=top_users)
 
@@ -346,21 +362,6 @@ def unfollow(username):
         flash(f'Something went wrong.', 'alert-danger')
         return redirect(url_for('index'))
 
-@app.route('/explore')
-def explore():
-    page = request.args.get('page', 1, type=int)
-    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
-    latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    recipes = Recipe.query.filter(Recipe.approved == True).order_by(Recipe.timestamp.desc()).paginate(
-        page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('explore', page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('explore', page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("explore.html", title='Explore', recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url,
-                          comments=latest_comments, top_users=top_users)
-
 @app.route('/msg')
 @login_required
 def msg():
@@ -383,11 +384,11 @@ def liked():
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = Recipe.query.filter(Recipe.likes.any(user_id=current_user.id)).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('explore', page=recipes.next_num) \
+    next_url = url_for('index', page=recipes.next_num) \
         if recipes.has_next else None
-    prev_url = url_for('explore', page=recipes.prev_num) \
+    prev_url = url_for('index', page=recipes.prev_num) \
         if recipes.has_prev else None
-    return render_template("explore.html", title='Liked', recipes=recipes.items,
+    return render_template("index.html", title='Liked', recipes=recipes.items,
                           next_url=next_url, prev_url=prev_url, label="Favourites",
                           comments=latest_comments, top_users=top_users)
 
@@ -409,7 +410,7 @@ def search(search):
         if recipes.has_next else None
     prev_url = url_for('search', search=search, page=recipes.prev_num) \
         if recipes.has_prev else None
-    return render_template("explore.html", title="Search: "+search, recipes=recipes.items,
+    return render_template("index.html", title="Search: "+search, recipes=recipes.items,
                           next_url=next_url, prev_url=prev_url, label="Search", value=search,
                           comments=latest_comments, top_users=top_users)
 
@@ -424,7 +425,7 @@ def category(category):
         if recipes.has_next else None
     prev_url = url_for('category', category=category, page=recipes.prev_num) \
         if recipes.has_prev else None
-    return render_template("explore.html", title="Category: "+category, recipes=recipes.items,
+    return render_template("index.html", title="Category: "+category, recipes=recipes.items,
                           next_url=next_url, prev_url=prev_url, label='Category', value=category,
                           comments=latest_comments, top_users=top_users)
 
@@ -439,7 +440,7 @@ def tag(tag):
         if recipes.has_next else None
     prev_url = url_for('tag', tag=tag, page=recipes.prev_num) \
         if recipes.has_prev else None
-    return render_template("explore.html", title="Tag: "+tag, recipes=recipes.items,
+    return render_template("index.html", title="Tag: "+tag, recipes=recipes.items,
                           next_url=next_url, prev_url=prev_url, label="Tag", value=tag,
                           comments=latest_comments, top_users=top_users)
 

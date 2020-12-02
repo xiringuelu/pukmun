@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block metas %}
+    {{ super() }}
+    <meta property="og:title" content="Your Pukmun Cookbook"/>
+    <meta property="og:description" content="Your online cooking book."/>
+    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
+    <meta property="og:url" content="{{ config['URL_BASE']  + url_for('cookbook')}}"/>
+{% endblock %}
+
+{% block app_content %}
+    <div class="row">
+        <div class="col-12 col-sm-12 col-lg-8 mb-3 mb-4 mb-lg-0">
+            {% if recipes %}
+            {% for recipe in recipes %}
+                {% include '_recipe.html' %}
+            {% endfor %}
+            {% include '_pages_recipes.html' %}
+            {% else %}
+                {% include '_noresults_cookbook.html' %}
+            {% endif %}
+        </div>
+        <div class="col-12 col-sm-12 col-lg-4">
+            <div class="row">
+                {% include '_sidebar.html' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
