@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request, session, s
 from app import login, app, db, avatars
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, RecipeForm, ResetPasswordRequestForm, ResetPasswordForm, CropAvatarForm, UploadAvatarForm, CommentForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Recipe, Comment, Notification
+from app.models import User, Recipe, Comment, Notification, Vote
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -24,10 +24,10 @@ def fromnow(date):
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-@app.route('/<recipe_name>/<recipe_id>', methods=['GET', 'POST'])
+@app.route('/recipe/<recipe_name>/<recipe_id>', methods=['GET', 'POST'])
 def recipe(recipe_name, recipe_id):
     form = CommentForm()
-    recipe = Recipe.query.filter_by(id=recipe_id).first_or_404()
+    recipe = Recipe.query.filter_by(id=recipe_id, approved=True).first_or_404()
     #comments = Comment.query.filter_by(recipe_id=recipe.id).order_by(Comment.timestamp.asc()).all()
     page = request.args.get('page', 1, type=int)
     comments = Comment.query.filter_by(recipe_id=recipe.id).order_by(Comment.timestamp.asc()).paginate(
@@ -71,21 +71,20 @@ def add_recipe():
         thumb.save(os.path.join(app.config['THUMBNAIL_PATH'], filename))
         recipe.image = filename
         db.session.add(recipe)
-        current_user.notifications.append(Notification(content=f"Your \"{recipe.name}\" recipe has been submitted. What's next? Read our FAQ."))
+        current_user.notifications.append(Notification(content=f"Your \"{recipe.name}\" recipe is now being moderated by our community.<br>No worries, that's normal! Every single recipe follows the same proccess.<br> What's next? Read our FAQ."))
         db.session.commit()
         flash('Your recipe has been sent for moderation! (Read FAQ)', 'alert-warning')
-        return redirect(url_for('recipe', recipe_name=recipe.urlify(), recipe_id=recipe.id))  
+        return redirect(url_for('index'))  
     return render_template('add_recipe.html', title='Add Recipe', form=form)
 
 @app.route('/index', methods=['GET'])
 @app.route('/', methods=['GET'])
-#@login_required
 def index():
     if not current_user.is_authenticated:
         flash(f'Please <a class="font-weight-bold" href="{url_for("login")}">log in</a> to enjoy the full Pukmun experience', 'alert-info')
         return render_template('index.html', title='Home')
     page = request.args.get('page', 1, type=int)
-    top_users = User.query.join(Recipe).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = current_user.followed_recipes().paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
@@ -141,7 +140,7 @@ def register():
 def user(username):
     user = User.query.filter(User.username.ilike(username)).first_or_404()
     page = request.args.get('page', 1, type=int)
-    recipes = user.recipes.order_by(Recipe.timestamp.desc()).paginate(
+    recipes = user.my_approved_recipes().order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
     next_url = url_for('user', username=user.username, page=recipes.next_num) \
         if recipes.has_next else None
@@ -198,6 +197,67 @@ def follow(username):
     else:
         return redirect(url_for('index'))
 
+@app.route('/upvote/<recipe>', methods=['POST'])
+@login_required
+def upvote(recipe):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        recipe_voted = Recipe.query.filter_by(id=recipe, approved=False).first()
+        if recipe_voted is None:
+            flash(f'[ERROR] Recipe doesn\'t exist or it has already been approved.', 'alert-danger')
+        elif Vote.query.filter_by(voter_id=current_user.id, recipe_id=recipe_voted.id).first() is not None:
+            flash(f'[ERROR] You\'ve already voted this recipe.', 'alert-danger')
+        else:
+            vote = Vote(voter_id=current_user.id, recipe_id=recipe, is_positive=True)
+            db.session.add(vote)
+            flash(f'Thanks for your vote!', 'alert-success')
+            if recipe_voted.upvotes() >= app.config['VOTES_TO_APPROVE']:
+                recipe_voted.approve()
+                new_notification = Notification(content=f'Congraulations, your <a href="{url_for("recipe", recipe_name=recipe_voted.name, recipe_id=recipe_voted.id)}">{recipe_voted.name}</a> recipe has just been approved by the community and is online.<br>Thanks for keep Pukmun going!', recipient_id=recipe_voted.author.id)
+                db.session.add(new_notification)
+            db.session.commit()
+    else:
+        flash(f'That\'s not the way it works!', 'alert-danger')
+        return redirect(url_for('index'))
+    return redirect(url_for('moderate'))
+
+@app.route('/downvote/<recipe>', methods=['POST'])
+@login_required
+def downvote(recipe):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        recipe_voted = Recipe.query.filter_by(id=recipe, approved=False).first()
+        if recipe_voted is None:
+            flash(f'[ERROR] Recipe does\'t exist or it has already been approved.', 'alert-danger')
+        elif Vote.query.filter_by(voter_id=current_user.id, recipe_id=recipe_voted.id).first() is not None:
+            flash(f'[ERROR] You\'ve already voted this recipe.', 'alert-danger')
+        else:
+            vote = Vote(voter_id=current_user.id, recipe_id=recipe, is_positive=False)
+            db.session.add(vote)
+            flash(f'Thanks for your vote!', 'alert-success')
+            if recipe_voted.downvotes() >= app.config['VOTES_TO_REJECT']:
+                new_notification = Notification(content=f'Dear user, your {recipe_voted.name} recipe has sadly been rejected by the community.<br>Read our FAQ to understand more about the process.', recipient_id=recipe_voted.author.id)
+                db.session.add(new_notification)
+                db.session.delete(recipe_voted)
+                os.remove(os.path.join(app.config['IMG_UPLOAD_PATH'], recipe_voted.image))
+                os.remove(os.path.join(app.config['THUMBNAIL_PATH'], recipe_voted.image))
+            db.session.commit()
+    else:
+        flash(f'That\'s not the way it works!', 'alert-danger')
+        return redirect(url_for('index'))
+    return redirect(url_for('moderate'))
+
+@app.route('/moderate', methods=['GET'])
+@login_required
+def moderate():
+    #left-join
+    recipe = Recipe.query.outerjoin(Vote).filter(Recipe.approved == False, Recipe.author != current_user, or_(Vote.voter_id == None, Vote.voter_id != current_user.id)).order_by(func.random()).first()
+    form_accept = EmptyForm()
+    form_reject = EmptyForm()
+    return render_template('moderate.html', title='Moderation Area',
+                                            recipe=recipe, form_accept=form_accept,
+                                            form_reject=form_reject)
+
 @app.route('/see/<notification>', methods=['POST'])
 @login_required
 def see(notification):
@@ -240,7 +300,6 @@ def remove_notification(notification):
             flash(f'Message marked as seen!', 'alert-success')
     return redirect(url_for('msg'))
 
-
 @app.route('/unfollow/<username>', methods=['POST'])
 @login_required
 def unfollow(username):
@@ -261,12 +320,11 @@ def unfollow(username):
         return redirect(url_for('index'))
 
 @app.route('/explore')
-#@login_required
 def explore():
     page = request.args.get('page', 1, type=int)
-    top_users = User.query.join(Recipe).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    recipes = Recipe.query.order_by(Recipe.timestamp.desc()).paginate(
+    recipes = Recipe.query.filter(Recipe.approved == True).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
     next_url = url_for('explore', page=recipes.next_num) \
         if recipes.has_next else None
@@ -291,9 +349,10 @@ def msg():
                           next_url=next_url, prev_url=prev_url)                        
 
 @app.route('/liked')
+@login_required
 def liked():
     page = request.args.get('page', 1, type=int)
-    top_users = User.query.join(Recipe).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = Recipe.query.filter(Recipe.likes.any(user_id=current_user.id)).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
@@ -315,9 +374,9 @@ def search(search):
     if not search:
         search = request.get_data()
     page = request.args.get('page', 1, type=int)
-    top_users = User.query.join(Recipe).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    recipes = Recipe.query.filter(or_(Recipe.name.like('%' + search + '%'), Recipe.tags.like('%' + search + '%'))).order_by(Recipe.timestamp.desc()).paginate(
+    recipes = Recipe.query.filter(Recipe.approved == True, or_(Recipe.name.like('%' + search + '%'), Recipe.tags.like('%' + search + '%'))).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
     next_url = url_for('search', search=search, page=recipes.next_num) \
         if recipes.has_next else None
@@ -330,9 +389,9 @@ def search(search):
 @app.route('/category/<category>')
 def category(category):
     page = request.args.get('page', 1, type=int)
-    top_users = User.query.join(Recipe).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    recipes = Recipe.query.filter(Recipe.category.like('%' + category + '%')).order_by(Recipe.timestamp.desc()).paginate(
+    recipes = Recipe.query.filter(Recipe.approved == True, Recipe.category.like('%' + category + '%')).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
     next_url = url_for('category', category=category, page=recipes.next_num) \
         if recipes.has_next else None
@@ -345,9 +404,9 @@ def category(category):
 @app.route('/tag/<tag>')
 def tag(tag):
     page = request.args.get('page', 1, type=int)
-    top_users = User.query.join(Recipe).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    recipes = Recipe.query.filter(Recipe.tags.like('%' + tag + '%')).order_by(Recipe.timestamp.desc()).paginate(
+    recipes = Recipe.query.filter(Recipe.approved == True, Recipe.tags.like('%' + tag + '%')).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
     next_url = url_for('tag', tag=tag, page=recipes.next_num) \
         if recipes.has_next else None
@@ -420,7 +479,7 @@ def crop():
 @app.route('/like/<int:recipe_id>/<action>')
 @login_required
 def like_action(recipe_id, action):
-    recipe = Recipe.query.filter_by(id=recipe_id).first_or_404()
+    recipe = Recipe.query.filter_by(id=recipe_id, approved=True).first_or_404()
     if action == 'like':
         current_user.like_recipe(recipe)
         db.session.commit()

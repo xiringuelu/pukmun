@@ -13,9 +13,9 @@
             <meta property="og:url" content="{{ config['URL_BASE'] + url_for('search', search=value) }}"/>
         {% endif %}
     {% else %}
-        <meta property="og:title" content="Explore - Pukmun"/>
-        <meta property="og:description" content="Explore our selection of recipes."/>
-        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('explore') }}"/>
+        <meta property="og:title" content="Moderation Area - Pukmun"/>
+        <meta property="og:description" content="Help us filter the web contents."/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('moderate') }}"/>
     {% endif %}
     <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
 {% endblock %}
@@ -23,29 +23,16 @@
 {% block app_content %}
     <div class="row">
         <div class="col-12 col-sm-12 col-lg-8 mb-3  mb-4 mb-lg-0">
-            {% if label %}
-                <nav aria-label="breadcrumb" class="text-uppercase">
-                    <ol class="breadcrumb default-color">
-                    <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                    <li class="breadcrumb-item active">{{ label }}</li>
-                    {% if value %}
-                        <li class="breadcrumb-item active" aria-current="page">{{ value }}</li>
-                    {% endif %}
-                    </ol>
-                </nav>
-            {% endif %}
-            {% if recipes %}
-                {% for recipe in recipes %}
-                    {% include '_recipe.html' %}
-                {% endfor %}
-                {% include '_pages_recipes.html' %}
+            {% if recipe %}
+                {% include '_recipe_moderation.html' %}
+                {% include '_pages_moderation.html' %}
             {% else %}
-                {% include '_noresults_explore.html' %}
+                {% include '_noresults_moderation.html' %}
             {% endif %}
         </div>
         <div class="col-12 col-sm-12 col-lg-4">
             <div class="row">
-                {% include '_sidebar.html' %}
+                {% include '_sidebar_moderation.html' %}
             </div>
         </div>
     </div>

@@ -43,6 +43,26 @@ class PukmunNotificationModelView(sqla.ModelView):
         flash('You don\'t have access to this area.', 'alert-danger')
         return redirect(url_for('index'))
 
+class PukmunVoteModelView(sqla.ModelView):
+    column_list = ('voter.username', 'recipe.name', 'is_positive')
+    column_filters = ('voter.username', 'recipe.name', 'is_positive')
+    column_searchable_list = ('voter.username', 'recipe.name')
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin
+    def inaccessible_callback(self, name, **kwargs):
+        flash('You don\'t have access to this area.', 'alert-danger')
+        return redirect(url_for('index'))
+
+class PukmunLikeModelView(sqla.ModelView):
+    column_list = ('user.username', 'recipe.name')
+    column_filters = ('user.username', 'recipe.name')
+    column_searchable_list = ('user.username', 'recipe.name')
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin
+    def inaccessible_callback(self, name, **kwargs):
+        flash('You don\'t have access to this area.', 'alert-danger')
+        return redirect(url_for('index'))
+
 class AdminIndexView(AdminIndexView):
     @expose('/')
     def index(self):

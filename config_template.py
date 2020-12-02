@@ -15,9 +15,13 @@ class Config(object):
     #SQLALCHEMY_DATABASE_URI = 'mysql://USER:PASS@HOST/DB_NAME'
     #SQLALCHEMY_POOL_RECYCLE = 299
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # Page Layout and rules
     RECIPES_PER_PAGE = 6
     COMMENTS_PER_PAGE = 4
     NOTIFICATIONS_PER_PAGE = 4
+    VOTES_TO_APPROVE = 1
+    VOTES_TO_REJECT = 1
     
     # Mail config
     # Local

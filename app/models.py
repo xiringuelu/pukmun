@@ -7,12 +7,19 @@ from time import time
 import jwt, re
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib import sqla
-from admin import PukmunUserModelView, PukmunRecipeModelView, PukmunCommentModelView, PukmunNotificationModelView
+from admin import PukmunUserModelView, PukmunRecipeModelView, PukmunCommentModelView, PukmunNotificationModelView, PukmunVoteModelView, PukmunLikeModelView
 
 followers = db.Table('followers',
     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
+
+class Vote(db.Model):
+    id= db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    voter_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
+    is_positive = db.Column(db.Boolean, default=False)
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,6 +40,10 @@ class RecipeLike(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<{self.user.username}: {self.recipe.name}>'   
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,7 +51,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    recipes = db.relationship('Recipe', backref='author', lazy='dynamic')
+    recipes = db.relationship('Recipe', backref='author', cascade="all,delete", lazy='dynamic')
     about_me = db.Column(db.Text, default='')
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     avatar_s = db.Column(db.String(64))
@@ -52,15 +63,22 @@ class User(UserMixin, db.Model):
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    liked = db.relationship(
+        'RecipeLike',
+        foreign_keys='RecipeLike.user_id',
+        backref='user', cascade="all,delete", lazy='dynamic')
 
-    notifications = db.relationship('Notification', backref='recipient', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', cascade="all,delete", lazy='dynamic')
+
+    votes = db.relationship('Vote', backref='voter', cascade="all,delete", lazy='dynamic')
+
+    notifications = db.relationship('Notification', backref='recipient', cascade="all,delete", lazy='dynamic')
 
     def unread_count(self):
         return self.notifications.filter(Notification.seen == False).count()
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)   
+        return f'<[{self.id}] {self.username}>'   
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -85,22 +103,22 @@ class User(UserMixin, db.Model):
         return self.followed.filter(
             followers.c.followed_id == user.id).count() > 0
 
+    def my_approved_recipes(self):
+        return Recipe.query.filter(Recipe.user_id == self.id, Recipe.approved == True)
+
+    def my_liked_recipes(self):
+        return Recipe.query.filter(Recipe.likes.any(user_id=self.id))
+
     def followed_recipes(self):
         followed = Recipe.query.join(
             followers, (followers.c.followed_id == Recipe.user_id)).filter(
-                followers.c.follower_id == self.id)
-        own = Recipe.query.filter_by(user_id=self.id)
-        return followed.union(own).order_by(Recipe.timestamp.desc())
+                followers.c.follower_id == self.id, Recipe.approved == True)
+        return followed.union(self.my_approved_recipes().union(self.my_liked_recipes())).order_by(Recipe.timestamp.desc())
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
             app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
-
-    liked = db.relationship(
-        'RecipeLike',
-        foreign_keys='RecipeLike.user_id',
-        backref='user', lazy='dynamic')
 
     def like_recipe(self, recipe):
         if not self.has_liked_recipe(recipe):
@@ -141,19 +159,33 @@ class Recipe(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     approved = db.Column(db.Boolean, default=False)
 
-    likes = db.relationship('RecipeLike', backref='recipe', lazy='dynamic')
+    likes = db.relationship('RecipeLike', backref='recipe', cascade="all,delete", lazy='dynamic')
 
-    comments = db.relationship('Comment', backref='recipe', lazy='dynamic')
+    votes = db.relationship('Vote', backref='recipe', cascade="all,delete", lazy='dynamic')
+
+    comments = db.relationship('Comment', backref='recipe', cascade="all,delete", lazy='dynamic')
 
     def __repr__(self):
-        return '<Recipe {}>'.format(self.name)
+        return f'<[{self.id}] {self.name}>'
 
     def urlify(self):
         url = re.sub(r"[^\w\s]", '', self.name)
         url = re.sub(r"\s+", '-', url)
         return url.lower()
 
+    def approve(self):
+        self.approved = True
+        self.timestamp = datetime.utcnow()
+
+    def upvotes(self):
+        return len(list(n for n in self.votes if n.is_positive == True))
+
+    def downvotes(self):
+        return len(list(n for n in self.votes if n.is_positive == False))
+
 admin.add_view(PukmunUserModelView(User, db.session))
 admin.add_view(PukmunRecipeModelView(Recipe, db.session))
 admin.add_view(PukmunCommentModelView(Comment, db.session))
 admin.add_view(PukmunNotificationModelView(Notification, db.session))
+admin.add_view(PukmunVoteModelView(Vote, db.session))
+admin.add_view(PukmunLikeModelView(RecipeLike, db.session))

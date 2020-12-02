@@ -5,7 +5,7 @@
         </a>
             <a class="badge badge-primary" href="{{ url_for('user', username=user.username.lower()) }}">{{ user.username }}</a>
         <div class="float-right">
-            <small class="card-subtitle badge badge-info">{{ user.recipes.count() }} recipes</small>
+            <small class="card-subtitle badge badge-info">{{ user.my_approved_recipes().count() }} recipes</small>
         </div>
     </div>
 </div>

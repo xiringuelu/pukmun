@@ -46,6 +46,7 @@
                         <span class="badge badge-danger">{{ current_user.unread_count() }}</span>
                     {% endif %}
                 </a>
+                <a class="dropdown-item" href="{{ url_for('moderate') }}"><i class="fas fa-gavel"></i> <span class="badge badge-secondary">Moderation</span></a>
                 {% if current_user.is_admin %}
                     <a class="dropdown-item" href="{{ url_for('admin.index') }}">
                         <i class="fas fa-wrench"></i> <span class="badge badge-danger">Admin. Panel</span>

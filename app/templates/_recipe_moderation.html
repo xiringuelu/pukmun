@@ -1,0 +1,36 @@
+<div class="row">
+    <div class="col">
+        <img class="img-fluid rounded center-block w-100" src="{{ url_for('get_img', filename=recipe.image) }}">
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col">
+        <h3>{{ recipe.name }}</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <i class="fas fa-concierge-bell"></i>
+        <a href="{{ url_for('category', category=recipe.category.lower()) }}" class="badge badge-success">{{ recipe.category or 'Uncategorised' }}</a>
+    </div>
+    <div class="col-md-8">
+        <i class="fas fa-tag"> </i>
+        {% if recipe.tags %}
+            {% for tag in recipe.tags.split(',') %}
+                <a href="{{ url_for('tag', tag=tag.lower()) }}" class="badge badge-warning">{{tag}}</a>
+            {% endfor %}
+        {% else %}
+            <span  class="badge badge-warning">Untagged</span>
+        {% endif %}
+    </div>
+</div>
+<hr>
+<div class="row mb-3">
+    <div class="col">
+        {{ recipe.description|safe }}
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-5"><h5><i class="fas fa-shopping-basket"></i> Ingredients <span class="badge badge-secondary">{{ recipe.serves or 'Undefined' }} <i class="fas fa-utensils"></i></span></h5>{{ recipe.ingredients|safe }}</div>
+    <div class="col-md-7"><h5><i class="fas fa-list"></i> Preparation</h5>{{ recipe.steps|safe }}</div>
+</div>
