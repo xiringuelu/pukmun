@@ -231,6 +231,8 @@ def upvote(recipe):
             flash(f'Thanks for your vote!', 'alert-success')
             if recipe_voted.upvotes() >= app.config['VOTES_TO_APPROVE']:
                 recipe_voted.approve()
+                for vote_to_remove in recipe_voted.votes_received():
+                    db.session.delete(vote_to_remove)
                 new_notification = Notification(content=f'Congraulations, your <a href="{url_for("recipe", recipe_name=recipe_voted.name, recipe_id=recipe_voted.id)}">{recipe_voted.name}</a> recipe has just been approved by the community and is online.<br>Thanks for keep Pukmun going!', recipient_id=recipe_voted.author.id)
                 db.session.add(new_notification)
             db.session.commit()
@@ -270,11 +272,9 @@ def downvote(recipe):
 def moderate():
     #left-join
     recipe = Recipe.query.outerjoin(Vote).filter(Recipe.approved == False, Recipe.author != current_user, or_(Vote.voter_id == None, Vote.voter_id != current_user.id)).order_by(func.random()).first()
-    form_accept = EmptyForm()
-    form_reject = EmptyForm()
+    form = EmptyForm()
     return render_template('moderate.html', title='Moderation Area',
-                                            recipe=recipe, form_accept=form_accept,
-                                            form_reject=form_reject)
+                                            recipe=recipe, form=form)
 
 @app.route('/see/<notification>', methods=['POST'])
 @login_required

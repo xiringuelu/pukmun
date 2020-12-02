@@ -1,11 +1,11 @@
 <div class="row mb-3">
   <div class="col">
     <form action="{{ url_for('upvote', recipe=recipe.id) }}" method="post">
-      {{ form_accept.hidden_tag() }}
+      {{ form.hidden_tag() }}
       <button class="btn btn-success float-left" type="submit"><i class="fas fa-check"></i> Accept</button>
     </form>
     <form action="{{ url_for('downvote', recipe=recipe.id) }}" method="post">
-      {{ form_accept.hidden_tag() }}
+      {{ form.hidden_tag() }}
       <button class="btn btn-danger float-right" type="submit"><i class="fas fa-times"></i> Reject</button>
     </form>
   </div>

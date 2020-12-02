@@ -6,7 +6,6 @@ from flask_login import UserMixin
 from time import time
 import jwt, re
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.contrib import sqla
 from admin import PukmunUserModelView, PukmunRecipeModelView, PukmunCommentModelView, PukmunNotificationModelView, PukmunVoteModelView, PukmunLikeModelView
 
 followers = db.Table('followers',
@@ -172,6 +171,9 @@ class Recipe(db.Model):
         url = re.sub(r"[^\w\s]", '', self.name)
         url = re.sub(r"\s+", '-', url)
         return url.lower()
+
+    def votes_received(self):
+        return Vote.query.filter(Vote.recipe_id == self.id).all()
 
     def approve(self):
         self.approved = True
