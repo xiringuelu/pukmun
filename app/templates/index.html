@@ -33,6 +33,37 @@
                     {% endif %}
                     </ol>
                 </nav>
+            {% else %}
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="float-left mt-2">
+                                    <h5>Latest Recipes</h5>
+                                </div>
+                                <div class="dropdown float-right">
+                                    <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Top Recipes
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="{{ url_for('top_global' )}}">
+                                            <i class="fas fa-heart"></i>
+                                            Always</a>
+                                        <a class="dropdown-item" href="{{ url_for('top_month' )}}">
+                                            <i class="fas fa-heart"></i>
+                                            Month</a>
+                                        <a class="dropdown-item" href="{{ url_for('top_week' )}}">
+                                            <i class="fas fa-heart"></i>
+                                            Week</a>
+                                        <a class="dropdown-item" href="{{ url_for('top_24h' )}}">
+                                            <i class="fas fa-heart"></i>
+                                            24h</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
             {% if recipes %}
                 {% for recipe in recipes %}

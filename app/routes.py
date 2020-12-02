@@ -2,10 +2,10 @@ from flask import render_template, flash, redirect, url_for, request, session, s
 from app import login, app, db, avatars
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, RecipeForm, ResetPasswordRequestForm, ResetPasswordForm, CropAvatarForm, UploadAvatarForm, CommentForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Recipe, Comment, Notification, Vote
+from app.models import User, Recipe, Comment, Notification, Vote, RecipeLike
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta
 from email_tools import send_password_reset_email
 from sqlalchemy import and_, or_, func
 import os, timeago, sys
@@ -95,6 +95,73 @@ def index():
                           next_url=next_url, prev_url=prev_url,
                           comments=latest_comments, top_users=top_users)
 
+@app.route('/top_global', methods=['GET'])
+@login_required
+def top_global():
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(Recipe.likes).desc())
+    page = request.args.get('page', 1, type=int)
+    recipes = top_recipes.paginate(
+        page, app.config['RECIPES_PER_PAGE'], False)
+    next_url = url_for('top_global', page=recipes.next_num) \
+        if recipes.has_next else None
+    prev_url = url_for('top_global', page=recipes.prev_num) \
+        if recipes.has_prev else None
+    return render_template("top.html", title="Top Global", recipes=recipes.items,
+                          next_url=next_url, prev_url=prev_url, label="Top", value="Global",
+                          comments=latest_comments, top_users=top_users)
+
+@app.route('/top_month', methods=['GET'])
+@login_required
+def top_month():
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=30)).desc())
+    page = request.args.get('page', 1, type=int)
+    recipes = top_recipes.paginate(
+        page, app.config['RECIPES_PER_PAGE'], False)
+    next_url = url_for('top_month', page=recipes.next_num) \
+        if recipes.has_next else None
+    prev_url = url_for('top_month', page=recipes.prev_num) \
+        if recipes.has_prev else None
+    return render_template("top.html", title="Top last 30 days", recipes=recipes.items,
+                          next_url=next_url, prev_url=prev_url, label="Top", value="last 30 days",
+                          comments=latest_comments, top_users=top_users)
+
+@app.route('/top_week', methods=['GET'])
+@login_required
+def top_week():
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=7)).desc())
+    page = request.args.get('page', 1, type=int)
+    recipes = top_recipes.paginate(
+        page, app.config['RECIPES_PER_PAGE'], False)
+    next_url = url_for('top_week', page=recipes.next_num) \
+        if recipes.has_next else None
+    prev_url = url_for('top_week', page=recipes.prev_num) \
+        if recipes.has_prev else None
+    return render_template("top.html", title="Top last 7 days", recipes=recipes.items,
+                          next_url=next_url, prev_url=prev_url, label="Top", value="last 7 days",
+                          comments=latest_comments, top_users=top_users)
+
+@app.route('/top_24h', methods=['GET'])
+@login_required
+def top_24h():
+    top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
+    latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=1)).desc())
+    page = request.args.get('page', 1, type=int)
+    recipes = top_recipes.paginate(
+        page, app.config['RECIPES_PER_PAGE'], False)
+    next_url = url_for('top_24h', page=recipes.next_num) \
+        if recipes.has_next else None
+    prev_url = url_for('top_24h', page=recipes.prev_num) \
+        if recipes.has_prev else None
+    return render_template("top.html", title="Top last 24 hours", recipes=recipes.items,
+                          next_url=next_url, prev_url=prev_url, label="Top", value="last 24 hours",
+                          comments=latest_comments, top_users=top_users)
 
 @app.route('/cookbook', methods=['GET'])
 @login_required

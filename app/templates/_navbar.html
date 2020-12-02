@@ -14,7 +14,7 @@
             </li>
             {% if not current_user.is_anonymous %}
                 <li class="nav-item{% if title == "Cookbook" %} active{% endif %}">
-                <a class="nav-link" href="{{ url_for('cookbook') }}"><i class="fas fa-book"></i> Your Cookbook</a>
+                <a class="nav-link" href="{{ url_for('cookbook') }}"><i class="fas fa-book"></i> Cookbook</a>
                 </li>
             {% endif %}
         </ul>
