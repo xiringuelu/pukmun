@@ -16,17 +16,31 @@
         </ol>
     </nav>
     {% if notifications %}
-        {% if not current_user.unread_count() %}
-            <div class="row mb-3">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                        <small class="card-title">You don't have new notifications.</small>
+        <div class="row mb-3">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="float-right ml-1">
+                            <form action="{{ url_for('remove_all') }}" method="post">
+                                {{ form.hidden_tag() }}
+                                <button class="btn btn-danger btn-sm" type="submit" alt="Remove All" onclick="return confirm('Are you sure? (Once confirmed cannot be reverted)')"><i class="fas fa-trash"></i> All</button>
+                            </form>
                         </div>
+                        {% if not current_user.unread_count() %}
+                            <small class="card-title">You don't have new notifications.</small>
+                        {% else %}
+                            <small class="card-title">You have {{ current_user.unread_count() }} unread notifications.</small>
+                            <div class="float-right mr-1">
+                                <form action="{{ url_for('see_all') }}" method="post">
+                                    {{ form.hidden_tag() }}
+                                    <button class="btn btn-primary btn-sm" type="submit" alt="Mark all as seen"><i class="fas fa-eye"></i> All</button>
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-        {% endif %}
+        </div>
         {% for notification in notifications %}
             {% include '_notification.html' %}
         {% endfor %}

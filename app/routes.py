@@ -148,7 +148,8 @@ def user(username):
         if recipes.has_prev else None
     form = EmptyForm()
     return render_template('user.html', title=user.username, user=user, recipes=recipes.items,
-                           next_url=next_url, prev_url=prev_url, form=form, clean_about_me=Markup(user.about_me.replace('&nbsp;', ' ')).striptags())
+                           next_url=next_url, prev_url=prev_url, form=form,
+                           clean_about_me=Markup(user.about_me.replace('&nbsp;', ' ')).striptags())
 
 @app.before_request
 def before_request():
@@ -195,6 +196,7 @@ def follow(username):
         flash(f'You are following {username}!', 'alert-success')
         return redirect(url_for('user', username=username))
     else:
+        flash(f'Something went wrong.', 'alert-danger')
         return redirect(url_for('index'))
 
 @app.route('/upvote/<recipe>', methods=['POST'])
@@ -272,6 +274,30 @@ def see(notification):
             flash(f'Message marked as seen!', 'alert-success')
     return redirect(url_for('msg'))
 
+@app.route('/see_all', methods=['POST'])
+@login_required
+def see_all():
+    form = EmptyForm()
+    if form.validate_on_submit():
+        notifications = Notification.query.filter(Notification.recipient_id == current_user.id, Notification.seen == False).all()
+        for notification in notifications:
+            notification.seen = True
+        db.session.commit()
+        flash(f'Everything marked as seen!', 'alert-success')
+    return redirect(url_for('msg'))
+
+@app.route('/remove_all', methods=['POST'])
+@login_required
+def remove_all():
+    form = EmptyForm()
+    if form.validate_on_submit():
+        notifications = Notification.query.filter(Notification.recipient_id == current_user.id).all()
+        for notification in notifications:
+            db.session.delete(notification)
+        db.session.commit()
+        flash(f'All notifications removed', 'alert-success')
+    return redirect(url_for('msg'))
+
 @app.route('/unsee/<notification>', methods=['POST'])
 @login_required
 def unsee(notification):
@@ -317,6 +343,7 @@ def unfollow(username):
         flash(f'You are not following {username}.', 'alert-success')
         return redirect(url_for('user', username=username))
     else:
+        flash(f'Something went wrong.', 'alert-danger')
         return redirect(url_for('index'))
 
 @app.route('/explore')
@@ -337,6 +364,7 @@ def explore():
 @app.route('/msg')
 @login_required
 def msg():
+    form = EmptyForm()
     page = request.args.get('page', 1, type=int)
     notifications = Notification.query.filter_by(recipient_id=current_user.id).order_by(Notification.timestamp.desc()).paginate(
         page, app.config['NOTIFICATIONS_PER_PAGE'], False)
@@ -344,7 +372,6 @@ def msg():
         if notifications.has_next else None
     prev_url = url_for('msg', page=notifications.prev_num) \
         if notifications.has_prev else None
-    form = EmptyForm()
     return render_template("notifications.html", title='Notifications', form=form, notifications=notifications.items,
                           next_url=next_url, prev_url=prev_url)                        
 
