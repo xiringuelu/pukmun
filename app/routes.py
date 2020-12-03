@@ -77,7 +77,7 @@ def add_recipe():
 @app.route('/', methods=['GET'])
 def index():
     if not current_user.is_authenticated:
-        flash(f'Please <a class="font-weight-bold" href="{url_for("login")}">log in</a> to enjoy the full Pukmun experience', 'alert-info')
+        flash(f'Please <a class="alert-link" href="{url_for("login")}">log in</a> to enjoy the full Pukmun experience', 'alert-info')
     page = request.args.get('page', 1, type=int)
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
@@ -162,7 +162,7 @@ def login():
             flash('Invalid username or password', 'alert-danger')
             return redirect(url_for('login'))
         elif not user.confirmed:
-            flash(f'You still need to confirm your email. Didn\'t get the email. <a href="{url_for("confirmation_request")}"><strong>Send me another confirmation email</strong></a>', 'alert-danger')
+            flash(f'You still need to confirm your email. Didn\'t get the email. <a class="alert-link" href="{url_for("confirmation_request")}"><strong>Send me another confirmation email</strong></a>', 'alert-danger')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         flash('Logged in successfully!', 'alert-success')
