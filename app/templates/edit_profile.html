@@ -1,25 +1,35 @@
 {% extends "base.html" %}
 {% from 'bootstrap/form.html' import render_form, render_field %}
 
+{% block metas %}
+    {{ super() }}
+    <meta property="og:title" content="My profile - Pukmun"/>
+    <meta property="og:description" content="Edit your information."/>
+    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}""/>
+    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('edit_profile') }}"/>
+{% endblock %}
+
 {% block app_content %}
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-        <li class="breadcrumb-item active" aria-current="page">Edit Profile</li>
-        </ol>
-    </nav>
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <label class="control-label">Avatar</label>
-                <p><img class="border border-primary rounded-circle" src="{{ current_user.avatar_m or avatars.default(size = 'm' ) }}"></p>
-                {{ render_form(form_avatar) }}
-                <hr>
-                {{ render_form(form_profile) }}
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Profile</li>
+                </ol>
+            </nav>
+            <label class="control-label">Avatar</label>
+            <div class="mb-2"><img class="border border-primary rounded-circle" src="{{ current_user.avatar_m or avatars.default(size = 'm' ) }}"></div>
+            {{ render_form(form_avatar) }}
+            <hr>
+            {{ render_form(form_profile) }}
+        </div>
+        <div class="col-12 col-sm-12 col-md-6">
+            <div class="row">
+                {% include "_sidebar_edit_profile.html" %}
             </div>
         </div>
     </div>
-    <br>
 {% endblock %}
 
 {% block scripts %}

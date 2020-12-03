@@ -2,14 +2,22 @@
 {% from 'bootstrap/form.html' import render_form, render_field %}
 
 {% block app_content %}
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-        <li class="breadcrumb-item active" aria-current="page">Add Recipe</li>
-        </ol>
-    </nav>
-    {{ render_form(form) }}
-    <br>
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add Recipe</li>
+                </ol>
+            </nav>
+            {{ render_form(form) }}
+        </div>
+        <div class="col-12 col-sm-12 col-md-6">
+            <div class="row">
+                {% include "_sidebar_add_recipe.html" %}
+            </div>
+        </div>
+    </div> 
 {% endblock %}
 
 {% block scripts %}

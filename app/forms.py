@@ -32,8 +32,8 @@ class CommentForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Regexp(r'^\w+$', message="Username must contain only letters numbers or underscore"), Length(min=5, max=25, message="Username must be betwen 5 & 25 characters")])
-    email = StringField('Email (you won\'t be able to change it later)', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    email = StringField('E-mail', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=5, max=25, message="Password must be betwen 5 & 25 characters")])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
@@ -50,7 +50,7 @@ class RegistrationForm(FlaskForm):
 
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Regexp(r'^\w+$', message="Username must contain only letters numbers or underscore")])
-    email = StringField('Email (you will need to confirm your new e-mail)', validators=[DataRequired(), Email()])
+    email = StringField('E-mail (you will need to confirm your new e-mail)', validators=[DataRequired(), Email()])
     about_me = CKEditorField('About me (500 max.)', validators=[Length(min=0, max=500)])
     submit = SubmitField('Submit')
     
@@ -109,7 +109,7 @@ class ConfirmationRequestForm(FlaskForm):
     submit = SubmitField('Request Confirmation E-mail')
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=5, max=25, message="Password must be betwen 5 & 25 characters")])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Request Password Reset')

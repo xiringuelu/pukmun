@@ -9,17 +9,20 @@
 {% endblock %}
 
 {% block app_content %}
-    <div class="row form-group">
-        <div class="col-xs-12 col-sm-4 col-lg-3 text-center">
+    <div class="row mb-3">
+        <div class="col-xs-12 col-sm-4 col-lg-3 text-center mb-2">
             <img  class='border border-primary rounded-circle center-block img-responsive' src="{{ user.avatar_l or avatars.default(size='l') }}" width="100%">
         </div>
-        <div class="col-xs-12 col-sm-8 col-lg-5">
-            <h3>{{ user.username }}</h3>
+        <div class="col-xs-12 col-sm-8 col-lg-5 mb-2">
+            <h3>
+                {{ user.username }}
+                {% if user == current_user %}
+                <a href="{{ url_for('edit_profile') }}"><i class="fas fa-pencil-alt"></i></a>
+                {% endif %}
+            </h3>
             {% if user.last_seen %}<p><i class="fas fa-calendar"></i> <span class="badge badge-info">{{ user.last_seen|timeago }}</span></p>{% endif %}
             {% if user.about_me %}{{ user.about_me|safe }}{% endif %}
-            {% if user == current_user %}
-            <p><a href="{{ url_for('edit_profile') }}" class="btn btn-success"><i class="fas fa-edit"></i> Edit your profile</a></p>
-            {% elif not current_user.is_following(user) %}
+            {% if not current_user.is_following(user) %}
                 <p><form action="{{ url_for('follow', username=user.username) }}" method="post">
                     {{ form.hidden_tag() }}
                     <button class="btn btn-success" type="submit"><i class="fas fa-heart"></i> Follow</button>
@@ -31,24 +34,40 @@
                 </form></p>
             {% endif %}
         </div>
-        <div class="col-xs-12 col-sm-12 col-lg-4">
-                <p><span class="badge badge-primary">Followers</span> <span class="badge badge-secondary">{{ user.followers.count() }}</span>
-                </p><p>
-                {% for follower in user.followers %}
-                <a data-toggle="tooltip" title="{{ follower.username }}" href="{{ url_for('user', username=follower.username.lower()) }}"><img  class='border border-primary rounded-circle' src="{{ follower.avatar_s or avatars.default(size='s') }}" width="30px"></a>
-                {% endfor %}
-                </p>
-                <p><span class="badge badge-primary">Following</span> <span class="badge badge-secondary">{{ user.followed.count() }}</span>
-                </p><p>
-                {% for followed in user.followed %}
-                <a data-toggle="tooltip" title="{{ followed.username }}" href="{{ url_for('user', username=followed.username.lower()) }}"><img  class='border border-primary rounded-circle' src="{{ followed.avatar_s or avatars.default(size='s') }}" width="30px"></a>
-                {% endfor %}
-                </p>
+        <div class="col-xs-12 col-sm-12 col-lg-4 mb-2">
+            {% if user.followers.count() %}
+                <div class="row mb-2">
+                    <div class="col">
+                        <span class="badge badge-primary">Followers</span> <span class="badge badge-secondary">{{ user.followers.count() }}</span>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col">
+                        {% for follower in user.followers %}
+                        <a data-toggle="tooltip" title="{{ follower.username }}" href="{{ url_for('user', username=follower.username.lower()) }}"><img  class='border border-primary rounded-circle' src="{{ follower.avatar_s or avatars.default(size='s') }}" width="30px"></a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if user.followed.count() %}
+                <div class="row mb-2">
+                    <div class="col">
+                        <span class="badge badge-primary">Following</span> <span class="badge badge-secondary">{{ user.followed.count() }}</span>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col">
+                        {% for followed in user.followed %}
+                            <a data-toggle="tooltip" title="{{ followed.username }}" href="{{ url_for('user', username=followed.username.lower()) }}"><img  class='border border-primary rounded-circle' src="{{ followed.avatar_s or avatars.default(size='s') }}" width="30px"></a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <h3>User recipes</h3>
+            <h3>User recipes <span class="badge badge-secondary">{{ user.recipes.count() }}</span></h3>
         </div>
     </div>
     <hr>

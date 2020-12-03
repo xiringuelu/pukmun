@@ -10,27 +10,35 @@
         </a>
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-lg-9 col-xl-10">
-        <p class="mb-1">
-            <a class="h5" href="{{ url_for('recipe', recipe_name=recipe.urlify(), recipe_id=recipe.id) }}">
-                {{ recipe.name }}
-            </a>
-            <small class="text-muted">by </small><a class="badge badge-primary" href="{{ url_for('user', username=recipe.author.username.lower()) }}">{{ recipe.author.username }}</a>
-            <p>
-            <i class="fas fa-calendar"></i>
-            <span  class="badge badge-info">{{ recipe.timestamp|timeago }}</span>
-            <br>
-            <i class="fas fa-utensil-spoon"> </i>
-            <a href="{{ url_for('category', category=recipe.category.lower()) }}" class="badge badge-success">{{ recipe.category or 'Uncategorised' }}</a>
-            <br>
-            <i class="fas fa-tag"> </i>
-            {% if recipe.tags %}
-                {% for tag in recipe.tags.split(',') %}
-                    <a href="{{ url_for('tag', tag=tag.lower()) }}" class="badge badge-warning">{{tag}}</a>
-                {% endfor %}
-            {% else %}
-                <span  class="badge badge-warning">Untagged</span>
-            {% endif %}
-            </p>
-        </p>
+        <div class="mb-1">
+            <div class="row">
+                <div class="col">
+                    <a class="h5" href="{{ url_for('recipe', recipe_name=recipe.urlify(), recipe_id=recipe.id) }}">
+                        {{ recipe.name }}
+                    </a>
+                    <small class="text-muted">by </small><a class="badge badge-primary" href="{{ url_for('user', username=recipe.author.username.lower()) }}">{{ recipe.author.username }}</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                <i class="fas fa-concierge-bell"> </i>
+                <a href="{{ url_for('category', category=recipe.category.lower()) }}" class="badge badge-success">{{ recipe.category or 'Uncategorised' }}</a>
+                <i class="fas fa-calendar"></i>
+                <span  class="badge badge-info">{{ recipe.timestamp|timeago }}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                <i class="fas fa-tag"> </i>
+                {% if recipe.tags %}
+                    {% for tag in recipe.tags.split(',') %}
+                        <a href="{{ url_for('tag', tag=tag.lower()) }}" class="badge badge-warning">{{tag}}</a>
+                    {% endfor %}
+                {% else %}
+                    <span  class="badge badge-warning">Untagged</span>
+                {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>

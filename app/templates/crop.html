@@ -5,22 +5,30 @@
 {{super()}}
 {{ avatars.jcrop_css() }} 
 {% endblock %}
+
 {% block app_content %}
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-        <li class="breadcrumb-item" aria-current="page">Upload Avatar</li>
-        <li class="breadcrumb-item active" aria-current="page">Crop Image</li>
-        </ol>
-    </nav>
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                {{ avatars.crop_box('get_avatar', session['raw_filename']) }}<br>
-                {{ render_form(form) }}
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                <li class="breadcrumb-item" aria-current="page">Upload Avatar</li>
+                <li class="breadcrumb-item active" aria-current="page">Crop Image</li>
+                </ol>
+            </nav>
+            {{ avatars.crop_box('get_avatar', session['raw_filename']) }}<br>
+            {{ render_form(form) }}
+        </div>
+        <div class="col-12 col-sm-12 col-md-6">
+            <div class="row">
+                {% include "_sidebar_crop.html" %}
             </div>
         </div>
     </div>
-    {{ avatars.jcrop_js() }}  
-    {{ avatars.init_jcrop() }} 
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+{{ avatars.jcrop_js() }}  
+{{ avatars.init_jcrop() }} 
 {% endblock %}
