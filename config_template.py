@@ -46,6 +46,8 @@ class Config(object):
     
     # Enter URL
     URL_BASE = 'URL'
+    # Server name
+    #SERVER_NAME = 'URL no HTTP'
 
     ### BOOTSTRAP THEMES
     #BOOTSTRAP_BOOTSWATCH_THEME = 'sketchy'
