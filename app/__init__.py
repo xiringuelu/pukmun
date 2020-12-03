@@ -28,10 +28,10 @@ admin.add_view(FileAdmin(path, '/static/', name='Static Files'))
 ckeditor = CKEditor(app)
 avatars = Avatars(app)
 
-with app.app_context():
-    if db.engine.url.drivername == 'sqlite':
-        migrate.init_app(app, db, render_as_batch=True)
-    else:
-        migrate.init_app(app, db)
+#with app.app_context():
+#    if db.engine.url.drivername == 'sqlite':
+#        migrate.init_app(app, db, render_as_batch=True)
+#    else:
+#        migrate.init_app(app, db)
 
 from app import routes, models, errors

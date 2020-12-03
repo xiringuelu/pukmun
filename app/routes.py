@@ -87,7 +87,6 @@ def index():
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/top_global', methods=['GET'])
-@login_required
 def top_global():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
@@ -100,7 +99,6 @@ def top_global():
                             comments=latest_comments, top_users=top_users)
 
 @app.route('/top_month', methods=['GET'])
-@login_required
 def top_month():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
@@ -113,7 +111,6 @@ def top_month():
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/top_week', methods=['GET'])
-@login_required
 def top_week():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
@@ -126,7 +123,6 @@ def top_week():
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/top_24h', methods=['GET'])
-@login_required
 def top_24h():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
