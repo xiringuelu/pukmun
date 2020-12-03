@@ -49,7 +49,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Email address already in use.')
 
 class EditProfileForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Regexp(r'^\w+$', message="Username must contain only letters numbers or underscore")])
+    username = StringField('Username', validators=[DataRequired(), Regexp(r'^\w+$', message="Username must contain only letters numbers or underscore"), Length(min=5, max=25, message="Username must be betwen 5 & 25 characters")])
     email = StringField('E-mail (you will need to confirm your new e-mail)', validators=[DataRequired(), Email()])
     about_me = CKEditorField('About me (500 max.)', validators=[Length(min=0, max=500)])
     submit = SubmitField('Submit')
