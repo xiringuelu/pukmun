@@ -11,7 +11,7 @@
 {% block app_content %}
     <div class="row">
         <div class="col-12 col-sm-12 col-lg-8 mb-3 mb-4 mb-lg-0">
-            {% if recipes %}
+            {% if recipes.items %}
             {% for recipe in recipes.items %}
                 {% include '_recipe.html' %}
             {% endfor %}
