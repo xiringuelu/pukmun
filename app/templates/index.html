@@ -47,17 +47,17 @@
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <a class="dropdown-item" href="{{ url_for('top_global' )}}">
-                                            <i class="fas fa-heart"></i>
+                                            <i class="fas fa-heart" style="color: red;"></i>
                                             Always</a>
                                         <a class="dropdown-item" href="{{ url_for('top_month' )}}">
-                                            <i class="fas fa-heart"></i>
-                                            Month</a>
+                                            <i class="fas fa-heart" style="color: red;"></i>
+                                            Last 30 days</a>
                                         <a class="dropdown-item" href="{{ url_for('top_week' )}}">
-                                            <i class="fas fa-heart"></i>
-                                            Week</a>
+                                            <i class="fas fa-heart" style="color: red;"></i>
+                                            Last 7 days</a>
                                         <a class="dropdown-item" href="{{ url_for('top_24h' )}}">
-                                            <i class="fas fa-heart"></i>
-                                            24h</a>
+                                            <i class="fas fa-heart" style="color: red;"></i>
+                                            Last 24h</a>
                                     </div>
                                 </div>
                             </div>
@@ -66,7 +66,7 @@
                 </div>
             {% endif %}
             {% if recipes %}
-                {% for recipe in recipes %}
+                {% for recipe in recipes.items %}
                     {% include '_recipe.html' %}
                 {% endfor %}
                 {% include '_pages_recipes.html' %}

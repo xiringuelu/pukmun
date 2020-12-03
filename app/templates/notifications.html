@@ -15,7 +15,7 @@
             <li class="breadcrumb-item active">Notifications</li>
         </ol>
     </nav>
-    {% if notifications %}
+    {% if notifications.items %}
         <div class="row mb-3">
             <div class="col">
                 <div class="card">
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </div>
-        {% for notification in notifications %}
+        {% for notification in notifications.items %}
             {% include '_notification.html' %}
         {% endfor %}
         {% include '_pages_notifications.html' %}

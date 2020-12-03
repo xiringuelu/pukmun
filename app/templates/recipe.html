@@ -77,8 +77,8 @@
                         <h5><i class="fas fa-comments"></i> Comments <span class="badge badge-secondary">{{ recipe.comments.count() }}</span></h5>
                     </div>
                 </div>
-                {% if comments %}
-                    {% for comment in comments %}
+                {% if comments.items %}
+                    {% for comment in comments.items %}
                         {% include '_comment.html' %}
                     {% endfor %}
                     {% include '_pages_comments.html' %}

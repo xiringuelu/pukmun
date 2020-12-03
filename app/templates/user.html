@@ -52,7 +52,7 @@
         </div>
     </div>
     <hr>
-    {% for recipe in recipes %}
+    {% for recipe in recipes.items %}
         {% include '_recipe_user.html' %}
     {% endfor %}
     {% include '_pages_recipes.html' %}

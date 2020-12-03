@@ -1,6 +1,64 @@
 <div class="row">
-  <div class="col">
-    <a role="button" class="btn btn-primary{% if not prev_url %} btn-outline-primary disabled{% endif %} float-left" {% if not prev_url %}aria-disabled="true"{% endif %}href="{{ prev_url or '#' }}"><span aria-hidden="true">&larr;</span> Newer recipes</a>
-    <a role="button" class="btn btn-primary{% if not next_url %} btn-outline-primary disabled{% endif %} float-right" {% if not next_url %}aria-disabled="true"{% endif %}href="{{ next_url or '#' }}">Older recipes <span aria-hidden="true">&rarr;</span></a>  
+   <div class="col">
+      <a role="button" class="mr-1 btn btn-outline-primary btn-sm{% if recipes.page == 1 %} disabled{% endif %} float-left" {% if recipes.page == 1 %}aria-disabled="true" {% endif %}href="
+      {% if url == 'index' or url == 'liked' %}
+      {{ url_for(url, page=recipes.prev_num) }}
+      {% elif url == 'category' %}
+      {{ url_for(url,  category=value, page=recipes.prev_num) }}
+      {% elif url == 'tag' %}
+      {{ url_for(url,  tag=value, page=recipes.prev_num) }}
+      {% elif url == 'search' %}
+      {{ url_for(url,  search=value, page=recipes.prev_num) }}
+      {% endif %}
+      "><i class="fas fa-angle-left"></i></a>
+      {% for page_num in recipes.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+          {% if recipes.page == page_num %}
+            <a role="button" href="
+            {% if url == 'index' or url == 'liked' %}
+            {{ url_for(url, page=recipes.page_num) }}
+            {% elif url == 'category' %}
+            {{ url_for(url,  category=value, page=recipes.page_num) }}
+            {% elif url == 'tag' %}
+            {{ url_for(url,  tag=value, page=recipes.page_num) }}
+            {% elif url == 'search' %}
+            {{ url_for(url,  search=value, page=recipes.page_num) }}
+            {% endif %}
+            " class="mr-1 btn btn-primary btn-sm float-left disabled">
+                {{ page_num }}
+            </a>
+          {% else %}
+            <a href="
+            {% if url == 'index' or url == 'liked' %}
+            {{ url_for(url, page=recipes.page_num) }}
+            {% elif url == 'category' %}
+            {{ url_for(url,  category=value, page=recipes.page_num) }}
+            {% elif url == 'tag' %}
+            {{ url_for(url,  tag=value, page=recipes.page_num) }}
+            {% elif url == 'search' %}
+            {{ url_for(url,  search=value, page=recipes.page_num) }}
+            {% endif %}
+            " class="mr-1 btn btn-outline-primary btn-sm float-left">
+                {{ page_num }}
+            </a>
+          {% endif %}
+        {% else %}
+          <a role="button" href="#"
+            class="mr-1 btn btn-outline-primary btn-sm float-left disabled">
+              ...
+          </a>
+        {% endif %}
+      {% endfor %}
+      <a role="button" class="btn btn-outline-primary btn-sm{% if recipes.page == recipes.pages %} disabled{% endif %} float-left" {% if recipes.page == recipes.pages %} aria-disabled="true" {% endif %}href="
+      {% if url == 'index' or url == 'liked' %}
+            {{ url_for(url, page=recipes.next_num) }}
+            {% elif url == 'category' %}
+            {{ url_for(url,  category=value, page=recipes.next_num) }}
+            {% elif url == 'tag' %}
+            {{ url_for(url,  tag=value, page=recipes.next_num) }}
+            {% elif url == 'search' %}
+            {{ url_for(url,  search=value, page=recipes.next_num) }}
+            {% endif %}
+      "><i class="fas fa-angle-right"></i></a>  
   </div>
 </div>

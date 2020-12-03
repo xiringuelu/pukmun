@@ -28,7 +28,7 @@
                 </nav>
             {% endif %}
             {% if recipes %}
-                {% for recipe in recipes %}
+                {% for recipe in recipes.items %}
                     {% include '_recipe.html' %}
                 {% endfor %}
                 {% include '_pages_recipes.html' %}

@@ -28,22 +28,18 @@ def favicon():
 def recipe(recipe_name, recipe_id):
     form = CommentForm()
     recipe = Recipe.query.filter_by(id=recipe_id, approved=True).first_or_404()
-    #comments = Comment.query.filter_by(recipe_id=recipe.id).order_by(Comment.timestamp.asc()).all()
     page = request.args.get('page', 1, type=int)
     comments = Comment.query.filter_by(recipe_id=recipe.id).order_by(Comment.timestamp.asc()).paginate(
         page, app.config['COMMENTS_PER_PAGE'], False)
-    next_url = url_for('recipe', page=comments.next_num, recipe_name=recipe.urlify(), recipe_id=recipe.id, _anchor='comments') \
-        if comments.has_next else None
-    prev_url = url_for('recipe', page=comments.prev_num, recipe_name=recipe.urlify(), recipe_id=recipe.id, _anchor='comments')  \
-        if comments.has_prev else None
-
     if form.validate_on_submit():
         comment = Comment(content=form.content.data, author=current_user, recipe_id=recipe.id)
         db.session.add(comment)
         db.session.commit()
         flash('Your comment has been published.', 'alert-success')
-        return redirect(url_for('recipe', next_url=next_url, prev_url=prev_url, recipe_name=recipe.urlify(), recipe_id=recipe.id, _anchor='comments'))
-    return render_template('recipe.html', next_url=next_url, prev_url=prev_url, form=form, title=recipe.name, recipe=recipe, user=recipe.author, comments=comments.items, clean_desc=Markup(recipe.description.replace('&nbsp;', ' ')).striptags())
+        last_page = len(comments.items)
+        return redirect(url_for('recipe', page=last_page, recipe_name=recipe.urlify(), recipe_id=recipe.id, _anchor='comments'))
+    return render_template('recipe.html', recipe_name=recipe_name, recipe_id=recipe_id, form=form, title=recipe.name, recipe=recipe, user=recipe.author, comments=comments, clean_desc=Markup(recipe.description.replace('&nbsp;', ' ')).striptags())
+
 
 @app.route('/add_recipe', methods=['GET', 'POST'])
 @login_required
@@ -87,12 +83,7 @@ def index():
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = Recipe.query.filter(Recipe.approved == True).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('index', page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('index', page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("index.html", title='Home', recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url,
+    return render_template("index.html", title='Home', recipes=recipes, url="index",
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/top_global', methods=['GET'])
@@ -104,13 +95,9 @@ def top_global():
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('top_global', page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('top_global', page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("top.html", title="Top Global", recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url, label="Top", value="Global",
-                          comments=latest_comments, top_users=top_users)
+    return render_template("top.html", title="Top Global", recipes=recipes,
+                            label="Top", value="Global", url='top_global',
+                            comments=latest_comments, top_users=top_users)
 
 @app.route('/top_month', methods=['GET'])
 @login_required
@@ -121,12 +108,8 @@ def top_month():
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('top_month', page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('top_month', page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("top.html", title="Top last 30 days", recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url, label="Top", value="last 30 days",
+    return render_template("top.html", title="Top last 30 days", recipes=recipes,
+                          url='top_month', label="Top", value="last 30 days",
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/top_week', methods=['GET'])
@@ -138,12 +121,8 @@ def top_week():
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('top_week', page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('top_week', page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("top.html", title="Top last 7 days", recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url, label="Top", value="last 7 days",
+    return render_template("top.html", title="Top last 7 days", recipes=recipes,
+                          url="top_week", label="Top", value="last 7 days",
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/top_24h', methods=['GET'])
@@ -155,12 +134,8 @@ def top_24h():
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('top_24h', page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('top_24h', page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("top.html", title="Top last 24 hours", recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url, label="Top", value="last 24 hours",
+    return render_template("top.html", title="Top last 24 hours", recipes=recipes,
+                          url="top_24h", label="Top", value="last 24 hours",
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/cookbook', methods=['GET'])
@@ -171,13 +146,9 @@ def cookbook():
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = current_user.followed_recipes().paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('cookbook', page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('cookbook', page=recipes.prev_num) \
-        if recipes.has_prev else None
     return render_template('cookbook.html', title='Cookbook',
-                           recipes=recipes.items, next_url=next_url,
-                           prev_url=prev_url, comments=latest_comments, top_users=top_users)
+                            recipes=recipes, url="cookbook",
+                            comments=latest_comments, top_users=top_users)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -225,13 +196,9 @@ def user(username):
     page = request.args.get('page', 1, type=int)
     recipes = user.my_approved_recipes().order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('user', username=user.username, page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('user', username=user.username, page=recipes.prev_num) \
-        if recipes.has_prev else None
     form = EmptyForm()
-    return render_template('user.html', title=user.username, user=user, recipes=recipes.items,
-                           next_url=next_url, prev_url=prev_url, form=form,
+    return render_template('user.html', title=user.username, user=user, recipes=recipes,
+                           url="user", form=form,
                            clean_about_me=Markup(user.about_me.replace('&nbsp;', ' ')).striptags())
 
 @app.before_request
@@ -406,7 +373,7 @@ def remove_notification(notification):
         else:
             db.session.delete(notif)
             db.session.commit()
-            flash(f'Message marked as seen!', 'alert-success')
+            flash(f'Message removed!', 'alert-success')
     return redirect(url_for('msg'))
 
 @app.route('/unfollow/<username>', methods=['POST'])
@@ -436,12 +403,8 @@ def msg():
     page = request.args.get('page', 1, type=int)
     notifications = Notification.query.filter_by(recipient_id=current_user.id).order_by(Notification.timestamp.desc()).paginate(
         page, app.config['NOTIFICATIONS_PER_PAGE'], False)
-    next_url = url_for('msg', page=notifications.next_num) \
-        if notifications.has_next else None
-    prev_url = url_for('msg', page=notifications.prev_num) \
-        if notifications.has_prev else None
-    return render_template("notifications.html", title='Notifications', form=form, notifications=notifications.items,
-                          next_url=next_url, prev_url=prev_url)                        
+    return render_template("notifications.html", title='Notifications', form=form,
+                            notifications=notifications, url="msg")                        
 
 @app.route('/liked')
 @login_required
@@ -451,12 +414,8 @@ def liked():
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = Recipe.query.filter(Recipe.likes.any(user_id=current_user.id)).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('index', page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('index', page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("index.html", title='Liked', recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url, label="Favourites",
+    return render_template("index.html", title='Liked', recipes=recipes,
+                          url="liked", label="Favourites",
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/search', methods=['POST'])
@@ -473,12 +432,8 @@ def search(search):
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = Recipe.query.filter(Recipe.approved == True, or_(Recipe.name.like('%' + search + '%'), Recipe.tags.like('%' + search + '%'))).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('search', search=search, page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('search', search=search, page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("index.html", title="Search: "+search, recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url, label="Search", value=search,
+    return render_template("index.html", title="Search: "+search, recipes=recipes,
+                          url="search", label="Search", value=search,
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/category/<category>')
@@ -488,12 +443,8 @@ def category(category):
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = Recipe.query.filter(Recipe.approved == True, Recipe.category.like('%' + category + '%')).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('category', category=category, page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('category', category=category, page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("index.html", title="Category: "+category, recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url, label='Category', value=category,
+    return render_template("index.html", title="Category: "+category, recipes=recipes,
+                          url="category", label='Category', value=category,
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/tag/<tag>')
@@ -503,12 +454,8 @@ def tag(tag):
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
     recipes = Recipe.query.filter(Recipe.approved == True, Recipe.tags.like('%' + tag + '%')).order_by(Recipe.timestamp.desc()).paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
-    next_url = url_for('tag', tag=tag, page=recipes.next_num) \
-        if recipes.has_next else None
-    prev_url = url_for('tag', tag=tag, page=recipes.prev_num) \
-        if recipes.has_prev else None
-    return render_template("index.html", title="Tag: "+tag, recipes=recipes.items,
-                          next_url=next_url, prev_url=prev_url, label="Tag", value=tag,
+    return render_template("index.html", title="Tag: "+tag, recipes=recipes,
+                          url="tag", label="Tag", value=tag,
                           comments=latest_comments, top_users=top_users)
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])

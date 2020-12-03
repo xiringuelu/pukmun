@@ -1,6 +1,26 @@
 <div class="row mb-3">
   <div class="col">
-    <a role="button" class="btn btn-primary{% if not prev_url %} btn-outline-primary disabled{% endif %} float-left" {% if not prev_url %}aria-disabled="true"{% endif %}href="{{ prev_url or '#' }}"><span aria-hidden="true">&larr;</span> Older</a>
-    <a role="button" class="btn btn-primary{% if not next_url %} btn-outline-primary disabled{% endif %} float-right" {% if not next_url %}aria-disabled="true"{% endif %}href="{{ next_url or '#' }}">Newer <span aria-hidden="true">&rarr;</span></a>  
-  </div>
+     <a role="button" class="mr-1 btn btn-outline-primary btn-sm{% if comments.page == 1 %} disabled{% endif %} float-left" {% if comments.page == 1 %}aria-disabled="true" {% endif %}href="{{ url_for('recipe', recipe_name=recipe_name, recipe_id=recipe_id, page=comments.prev_num, _anchor='comments') }}"><i class="fas fa-angle-left"></i></a>
+     {% for page_num in comments.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+       {% if page_num %}
+         {% if comments.page == page_num %}
+           <a role="button" href="{{ url_for('recipe', recipe_name=recipe_name, recipe_id=recipe_id, page=page_num, _anchor='comments') }}"
+               class="mr-1 btn btn-primary btn-sm float-left disabled">
+               {{ page_num }}
+           </a>
+         {% else %}
+           <a href="{{ url_for('recipe', recipe_name=recipe_name, recipe_id=recipe_id, page=page_num, _anchor='comments') }}"
+               class="mr-1 btn btn-outline-primary btn-sm float-left">
+               {{ page_num }}
+           </a>
+         {% endif %}
+       {% else %}
+         <a role="button" href="#"
+           class="mr-1 btn btn-outline-primary btn-sm float-left disabled">
+             ...
+         </a>
+       {% endif %}
+     {% endfor %}
+     <a role="button" class="btn btn-outline-primary btn-sm{% if comments.page == comments.pages %} disabled{% endif %} float-left" {% if comments.page == comments.pages %} aria-disabled="true" {% endif %}href="{{ url_for('recipe', recipe_name=recipe_name, recipe_id=recipe_id, page=comments.next_num, _anchor='comments')  }}"><i class="fas fa-angle-right"></i></a>  
+ </div>
 </div>
