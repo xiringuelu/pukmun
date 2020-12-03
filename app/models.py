@@ -49,6 +49,7 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
+    confirmed = db.Column(db.Boolean, default=False)
     password_hash = db.Column(db.String(128))
     recipes = db.relationship('Recipe', backref='author', cascade="all,delete", lazy='dynamic')
     about_me = db.Column(db.Text, default='')
@@ -119,6 +120,11 @@ class User(UserMixin, db.Model):
             {'reset_password': self.id, 'exp': time() + expires_in},
             app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
+    def get_confirmation_token(self, expires_in=600):
+        return jwt.encode(
+            {'confirmation': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
     def like_recipe(self, recipe):
         if not self.has_liked_recipe(recipe):
             like = RecipeLike(user_id=self.id, recipe_id=recipe.id)
@@ -140,6 +146,15 @@ class User(UserMixin, db.Model):
         try:
             id = jwt.decode(token, app.config['SECRET_KEY'],
                             algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
+
+    @staticmethod
+    def verify_confirmation_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['confirmation']
         except:
             return
         return User.query.get(id)

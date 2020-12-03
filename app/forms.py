@@ -11,7 +11,6 @@ class UploadAvatarForm(FlaskForm):
         FileRequired(),
         FileAllowed(['jpg', 'png'], 'The file format should be .jpg or .png.')
     ])
-    style={'class': 'ourClasses', 'style': 'width:50%; other_css_style;'}
     submit = SubmitField('Upload')
 
 class CropAvatarForm(FlaskForm):
@@ -22,7 +21,7 @@ class CropAvatarForm(FlaskForm):
     submit = SubmitField('Crop')
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Regexp(r'^\w+$', message="Username must contain only letters numbers or underscore")])
+    username_or_email = StringField('Username or E-mail', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
@@ -51,18 +50,26 @@ class RegistrationForm(FlaskForm):
 
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Regexp(r'^\w+$', message="Username must contain only letters numbers or underscore")])
+    email = StringField('Email (you will need to confirm your new e-mail)', validators=[DataRequired(), Email()])
     about_me = CKEditorField('About me (500 max.)', validators=[Length(min=0, max=500)])
     submit = SubmitField('Submit')
     
-    def __init__(self, original_username, *args, **kwargs):
+    def __init__(self, original_username, original_email, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
+        self.original_email = original_email
 
     def validate_username(self, username):
-        if username.data != self.original_username:
-            user = User.query.filter_by(username=self.username.data).first()
+        if username.data.lower() != self.original_username.lower():
+            user = User.query.filter(User.username.ilike(self.username.data)).first()
             if user is not None:
                 raise ValidationError('Please use a different username.')
+    
+    def validate_email(self, email):
+        if email.data.lower() != self.original_email.lower():
+            user = User.query.filter(User.email.ilike(self.email.data)).first()
+            if user is not None:
+                raise ValidationError('Please use a different e-mail.')
 
 class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')
@@ -96,6 +103,10 @@ class RecipeForm(FlaskForm):
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Request Password Reset')
+
+class ConfirmationRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Confirmation E-mail')
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])

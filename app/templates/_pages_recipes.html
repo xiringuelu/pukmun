@@ -1,7 +1,7 @@
 <div class="row">
    <div class="col">
       <a role="button" class="mr-1 btn btn-outline-primary btn-sm{% if recipes.page == 1 %} disabled{% endif %} float-left" {% if recipes.page == 1 %}aria-disabled="true" {% endif %}href="
-      {% if url == 'index' or url == 'liked' %}
+      {% if url == 'index' or url == 'liked' or url.startswith('top')%}
       {{ url_for(url, page=recipes.prev_num) }}
       {% elif url == 'category' %}
       {{ url_for(url,  category=value, page=recipes.prev_num) }}
@@ -15,28 +15,28 @@
         {% if page_num %}
           {% if recipes.page == page_num %}
             <a role="button" href="
-            {% if url == 'index' or url == 'liked' %}
-            {{ url_for(url, page=recipes.page_num) }}
+            {% if url == 'index' or url == 'liked' or url.startswith('top') %}
+            {{ url_for(url, page=page_num) }}
             {% elif url == 'category' %}
-            {{ url_for(url,  category=value, page=recipes.page_num) }}
+            {{ url_for(url,  category=value, page=page_num) }}
             {% elif url == 'tag' %}
-            {{ url_for(url,  tag=value, page=recipes.page_num) }}
+            {{ url_for(url,  tag=value, page=page_num) }}
             {% elif url == 'search' %}
-            {{ url_for(url,  search=value, page=recipes.page_num) }}
+            {{ url_for(url,  search=value, page=page_num) }}
             {% endif %}
             " class="mr-1 btn btn-primary btn-sm float-left disabled">
                 {{ page_num }}
             </a>
           {% else %}
             <a href="
-            {% if url == 'index' or url == 'liked' %}
-            {{ url_for(url, page=recipes.page_num) }}
+            {% if url == 'index' or url == 'liked' or url.startswith('top') %}
+            {{ url_for(url, page=page_num) }}
             {% elif url == 'category' %}
-            {{ url_for(url,  category=value, page=recipes.page_num) }}
+            {{ url_for(url,  category=value, page=page_num) }}
             {% elif url == 'tag' %}
-            {{ url_for(url,  tag=value, page=recipes.page_num) }}
+            {{ url_for(url,  tag=value, page=page_num) }}
             {% elif url == 'search' %}
-            {{ url_for(url,  search=value, page=recipes.page_num) }}
+            {{ url_for(url,  search=value, page=page_num) }}
             {% endif %}
             " class="mr-1 btn btn-outline-primary btn-sm float-left">
                 {{ page_num }}
@@ -50,7 +50,7 @@
         {% endif %}
       {% endfor %}
       <a role="button" class="btn btn-outline-primary btn-sm{% if recipes.page == recipes.pages %} disabled{% endif %} float-left" {% if recipes.page == recipes.pages %} aria-disabled="true" {% endif %}href="
-      {% if url == 'index' or url == 'liked' %}
+      {% if url == 'index' or url == 'liked' or url.startswith('top') %}
             {{ url_for(url, page=recipes.next_num) }}
             {% elif url == 'category' %}
             {{ url_for(url,  category=value, page=recipes.next_num) }}

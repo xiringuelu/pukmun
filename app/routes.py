@@ -1,12 +1,12 @@
 from flask import render_template, flash, redirect, url_for, request, session, send_from_directory, Markup
 from app import login, app, db, avatars
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, RecipeForm, ResetPasswordRequestForm, ResetPasswordForm, CropAvatarForm, UploadAvatarForm, CommentForm
+from app.forms import ConfirmationRequestForm, LoginForm, RegistrationForm, EditProfileForm, EmptyForm, RecipeForm, ResetPasswordRequestForm, ResetPasswordForm, CropAvatarForm, UploadAvatarForm, CommentForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Recipe, Comment, Notification, Vote, RecipeLike
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
-from email_tools import send_password_reset_email
+from email_tools import send_password_reset_email, send_confirmation_email
 from sqlalchemy import and_, or_, func
 import os, timeago, sys
 from random import randint
@@ -157,9 +157,12 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter(User.username.ilike(form.username.data)).first()
+        user = User.query.filter(or_(User.username.ilike(form.username_or_email.data), User.email.ilike(form.username_or_email.data))).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password', 'alert-danger')
+            return redirect(url_for('login'))
+        elif not user.confirmed:
+            flash(f'You still need to confirm your email. Didn\'t get the email. <a href="{url_for("confirmation_request")}"><strong>Send me another confirmation email</strong></a>', 'alert-danger')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         flash('Logged in successfully!', 'alert-success')
@@ -185,7 +188,8 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!', 'alert-success')
+        flash('User registered! Please check your e-mail to confirm your account.', 'alert-success')
+        send_confirmation_email(user)
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -210,7 +214,7 @@ def before_request():
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    form_edit_profile = EditProfileForm(current_user.username)
+    form_edit_profile = EditProfileForm(current_user.username, current_user.email)
     form_edit_avatar = UploadAvatarForm()
     if form_edit_avatar.validate_on_submit() and form_edit_avatar.submit.data:
         f = request.files.get('image')
@@ -220,11 +224,21 @@ def edit_profile():
     elif form_edit_profile.validate_on_submit() and form_edit_profile.submit.data:
         current_user.username = form_edit_profile.username.data
         current_user.about_me = form_edit_profile.about_me.data
-        db.session.commit()
         flash('Your changes have been saved.', 'alert-success')
+        if current_user.email.lower() != form_edit_profile.email.data.lower():
+            current_user.email = form_edit_profile.email.data
+            current_user.confirmed = False
+            db.session.commit()
+            flash('Please check your e-mail to confirm your new e-mail address.', 'alert-info')
+            send_confirmation_email(current_user)
+            logout_user()
+            return redirect(url_for('login'))
+        current_user.email = form_edit_profile.email.data
+        db.session.commit()
         return redirect(url_for('user', username=current_user.username.lower()))
     elif request.method == 'GET':
         form_edit_profile.username.data = current_user.username
+        form_edit_profile.email.data = current_user.email
         form_edit_profile.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile',
                            form_avatar=form_edit_avatar, form_profile=form_edit_profile)
@@ -464,13 +478,27 @@ def reset_password_request():
         return redirect(url_for('index'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter(User.email.ilike(form.email.data)).first()
         if user:
             send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password', 'alert-info')
         return redirect(url_for('login'))
     return render_template('reset_password_request.html',
                            title='Reset Password', form=form)
+
+@app.route('/confirmation_request', methods=['GET', 'POST'])
+def confirmation_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = ConfirmationRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter(User.email.ilike(form.email.data)).first()
+        if user:
+            send_confirmation_email(user)
+        flash('Check your email for the instructions to confirm your account', 'alert-info')
+        return redirect(url_for('login'))
+    return render_template('confirmation_request.html',
+                           title='Confirmation Request', form=form)
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -486,6 +514,19 @@ def reset_password(token):
         flash('Your password has been reset.', 'alert-success')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+
+@app.route('/confirmation/<token>', methods=['GET', 'POST'])
+def confirmation(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_confirmation_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    else:
+        user.confirmed = True
+        db.session.commit()
+        flash('Your e-mail has been confirmed.', 'alert-success')
+        return redirect(url_for('login'))
 
 @app.route('/avatars/<path:filename>')
 def get_avatar(filename):

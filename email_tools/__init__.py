@@ -22,3 +22,13 @@ def send_password_reset_email(user):
                                          user=user, token=token),
                html_body=render_template('email/reset_password.html',
                                          user=user, token=token))
+
+def send_confirmation_email(user):
+    token = user.get_confirmation_token()
+    send_email('[Pukmun] E-mail confirmation',
+               sender=app.config['ADMINS'][0],
+               recipients=[user.email],
+               text_body=render_template('email/confirmation.txt',
+                                         user=user, token=token),
+               html_body=render_template('email/confirmation.html',
+                                         user=user, token=token))

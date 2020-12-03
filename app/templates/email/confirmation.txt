@@ -1,0 +1,11 @@
+Dear {{ user.username }},
+
+To confirm your e-mail click on the following link:
+
+{{ url_for('confirmation', token=token, _external=True) }}
+
+If you have not recently registered or requested a confirmation email simply ignore this message.
+
+Sincerely,
+
+The Pukmun Team

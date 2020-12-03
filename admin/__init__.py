@@ -4,8 +4,8 @@ from flask_login import current_user
 from flask import flash, redirect, url_for
 
 class PukmunUserModelView(sqla.ModelView):
-    column_list = ('username', 'email', 'is_admin')
-    column_filters = ('username', 'email', 'is_admin')
+    column_list = ('username', 'email', 'is_admin', 'confirmed')
+    column_filters = ('username', 'email', 'is_admin', 'confirmed')
     column_searchable_list = ('username', 'email')
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
