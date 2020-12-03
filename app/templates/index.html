@@ -65,7 +65,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if recipes %}
+            {% if recipes.items %}
                 {% for recipe in recipes.items %}
                     {% include '_recipe.html' %}
                 {% endfor %}
