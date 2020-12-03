@@ -34,6 +34,9 @@ class Config(object):
     #MAIL_USERNAME = 'email@email.com'
     #MAIL_PASSWORD = 'password'
 
+    ### Disable multithread mail dispatcher (pythonanywhere.com free accounts)
+    #SINGLE_THREAD = True
+
     ADMINS = ['email@email.com']
     CKEDITOR_PKG_TYPE = 'basic'
     AVATARS_SAVE_PATH = os.path.join(basedir, 'avatars')
