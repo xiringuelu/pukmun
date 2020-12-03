@@ -52,8 +52,12 @@
         </div>
     </div>
     <hr>
+    {% if recipes.items %}
     {% for recipe in recipes.items %}
         {% include '_recipe_user.html' %}
     {% endfor %}
-    {% include '_pages_recipes.html' %}
+        {% include '_pages_recipes.html' %}
+    {% else %}
+        {% include '_noresults_user.html' %}
+    {% endif %}
 {% endblock %}
