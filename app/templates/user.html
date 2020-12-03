@@ -22,16 +22,18 @@
             </h3>
             {% if user.last_seen %}<p><i class="fas fa-calendar"></i> <span class="badge badge-info">{{ user.last_seen|timeago }}</span></p>{% endif %}
             {% if user.about_me %}{{ user.about_me|safe }}{% endif %}
-            {% if not current_user.is_following(user) %}
-                <p><form action="{{ url_for('follow', username=user.username) }}" method="post">
-                    {{ form.hidden_tag() }}
-                    <button class="btn btn-success" type="submit"><i class="fas fa-heart"></i> Follow</button>
-                </form></p>
-            {% else %}
-                <p><form action="{{ url_for('unfollow', username=user.username) }}" method="post">
-                    {{ form.hidden_tag() }}
-                    <button class="btn btn-danger" type="submit"><i class="fas fa-heart-broken"></i> Unfollow</button>
-                </form></p>
+            {% if user != current_user %}
+                {% if not current_user.is_following(user) %}
+                    <p><form action="{{ url_for('follow', username=user.username) }}" method="post">
+                        {{ form.hidden_tag() }}
+                        <button class="btn btn-success" type="submit"><i class="fas fa-heart"></i> Follow</button>
+                    </form></p>
+                {% else %}
+                    <p><form action="{{ url_for('unfollow', username=user.username) }}" method="post">
+                        {{ form.hidden_tag() }}
+                        <button class="btn btn-danger" type="submit"><i class="fas fa-heart-broken"></i> Unfollow</button>
+                    </form></p>
+                {% endif %}
             {% endif %}
         </div>
         <div class="col-xs-12 col-sm-12 col-lg-4 mb-2">
