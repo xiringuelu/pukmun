@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col text-center">
+        <div class="display-1">4<i class="far fa-question-circle fa-spin"></i>5</div>
+        <div class="display-4">Invalid method</div>
+        <div class="lead mt-4">The way you tried to access this page is wrong. Did you copy the link? Tried to go back to an already sent form? Please try again.</div>
+        <div class="lead mt-2">Let's go <a href="{{ url_for("index") }}"><i class="fas fa-home"></i> home</a> and try from there.</div>
+    </div>
+</div>
+{% endblock %}

@@ -2,8 +2,11 @@
 
 {% block app_content %}
 <div class="row">
-    <div class="col">
-        <img class="img-fluid" width="100%" src="{{ url_for("static", filename="404.png")}}"/>
+    <div class="col text-center">
+        <div class="display-1">4<i class="far fa-question-circle fa-spin"></i>4</div>
+        <div class="display-4">Not found</div>
+        <div class="lead mt-4">Maybe this page moved? Got deleted? Is hiding out in quarantine? Never existed in the first place?</div>
+        <div class="lead mt-2">Let's go <a href="{{ url_for("index") }}"><i class="fas fa-home"></i> home</a> and try from there.</div>
     </div>
 </div>
 {% endblock %}

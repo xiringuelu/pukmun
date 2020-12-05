@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>The file you were trying to upload was over 2MB</h1>
-    <p>We have limited storage, please try reducing the size.</p>
-    <p><a class="btn btn-primary" href="{{ url_for('index') }}">Back</a></p>
+<div class="row">
+    <div class="col text-center">
+        <div class="display-1">413</div>
+        <div class="display-4">Size exceded</div>
+        <div class="lead mt-4">The file you were trying to upload was over X MB. We have limited storage, please try reducing the size.</div>
+        <div class="lead mt-2">Let's go <a href="{{ url_for("index") }}"><i class="fas fa-home"></i> home</a> and try from there.</div>
+    </div>
+</div>
 {% endblock %}

@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>An unexpected error has occurred</h1>
-    <p>The administrator has been notified. Sorry for the inconvenience!</p>
-    <p><a href="{{ url_for('index') }}">Back</a></p>
+<div class="row">
+    <div class="col text-center">
+        <div class="display-1">5<i class="far fa-question-circle fa-spin"></i><i class="far fa-question-circle fa-spin"></i></div>
+        <div class="display-4">Unexpected error</div>
+        <div class="lead mt-4">We don't know what happened, but something went wrong... upppps! Our coders will check it soon.</div>
+        <div class="lead mt-2">Let's go <a href="{{ url_for("index") }}"><i class="fas fa-home"></i> home</a> and try from there.</div>
+    </div>
+</div>
 {% endblock %}
