@@ -1,7 +1,7 @@
 <div class="row">
    <div class="col">
       <a role="button" class="mr-1 btn btn-outline-primary btn-sm{% if recipes.page == 1 %} disabled{% endif %} float-left" {% if recipes.page == 1 %}aria-disabled="true" {% endif %}href="
-      {% if url == 'index' or url='user' or url == 'liked' or url == 'cookbook' or url.startswith('top')%}
+      {% if url == 'index' or url== 'user' or url == 'liked' or url == 'cookbook' or url.startswith('top')%}
       {{ url_for(url, page=recipes.prev_num) }}
       {% elif url == 'category' %}
       {{ url_for(url,  category=value, page=recipes.prev_num) }}
