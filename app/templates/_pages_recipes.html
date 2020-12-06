@@ -4,7 +4,7 @@
       {% if url == 'index' or url == 'liked' or url == 'cookbook' or url.startswith('top')%}
       {{ url_for(url, page=recipes.prev_num) }}
       {% elif url == 'user' %}
-      {{ url_for(url,  username=user.username, page=recipes.prev_num) }}
+      {{ url_for(url,  username=user.username, page=recipes.prev_num, _anchor='user_recipes') }}
       {% elif url == 'category' %}
       {{ url_for(url,  category=value, page=recipes.prev_num) }}
       {% elif url == 'tag' %}
@@ -20,7 +20,7 @@
             {% if url == 'index' or url == 'liked' or url == 'cookbook' or url.startswith('top') %}
             {{ url_for(url, page=page_num) }}
             {% elif url == 'user' %}
-            {{ url_for(url,  username=user.username, page=page_num) }}
+            {{ url_for(url,  username=user.username, page=page_num, _anchor='user_recipes') }}
             {% elif url == 'category' %}
             {{ url_for(url,  category=value, page=page_num) }}
             {% elif url == 'tag' %}
@@ -36,7 +36,7 @@
             {% if url == 'index' or url == 'liked' or url == 'cookbook' or url.startswith('top') %}
             {{ url_for(url, page=page_num) }}
             {% elif url == 'user' %}
-            {{ url_for(url,  username=user.username, page=page_num) }}
+            {{ url_for(url,  username=user.username, page=page_num, _anchor='user_recipes') }}
             {% elif url == 'category' %}
             {{ url_for(url,  category=value, page=page_num) }}
             {% elif url == 'tag' %}
@@ -59,7 +59,7 @@
       {% if url == 'index' or url == 'liked' or url == 'cookbook' or url.startswith('top') %}
             {{ url_for(url, page=recipes.next_num) }}
             {% elif url == 'user' %}
-            {{ url_for(url,  username=user.username, page=recipes.next_num) }}
+            {{ url_for(url,  username=user.username, page=recipes.next_num, _anchor='user_recipes') }}
             {% elif url == 'category' %}
             {{ url_for(url,  category=value, page=recipes.next_num) }}
             {% elif url == 'tag' %}
