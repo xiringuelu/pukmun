@@ -90,7 +90,7 @@ def index():
 def top_global():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(Recipe.likes).desc())
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(RecipeLike.timestamp).desc())
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
@@ -102,7 +102,7 @@ def top_global():
 def top_month():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=30)).desc())
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(1).filter(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=30)).desc())
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
@@ -114,7 +114,7 @@ def top_month():
 def top_week():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=7)).desc())
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(1).filter(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=7)).desc())
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
@@ -126,7 +126,7 @@ def top_week():
 def top_24h():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=1)).desc())
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(1).filter(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=1)).desc())
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
