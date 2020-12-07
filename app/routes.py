@@ -7,7 +7,7 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 from email_tools import send_password_reset_email, send_confirmation_email
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, case
 import os, timeago, sys
 from random import randint
 from PIL import Image
@@ -102,7 +102,7 @@ def top_global():
 def top_month():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(1).filter(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=30)).desc())
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(case([(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=30),1)])).desc())
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
@@ -114,7 +114,7 @@ def top_month():
 def top_week():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(1).filter(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=7)).desc())
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(case([(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=7),1)])).desc())
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
@@ -126,7 +126,7 @@ def top_week():
 def top_24h():
     top_users = User.query.join(Recipe).filter(Recipe.approved == True).group_by(User).order_by(func.count(User.recipes).desc()).limit(3).all()
     latest_comments = Comment.query.order_by(Comment.timestamp.desc()).limit(5).all()
-    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(1).filter(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=1)).desc())
+    top_recipes = Recipe.query.filter(Recipe.approved == True).outerjoin(RecipeLike).group_by(Recipe).order_by(func.count(case([(RecipeLike.timestamp >= datetime.utcnow() - timedelta(days=1),1)])).desc())
     page = request.args.get('page', 1, type=int)
     recipes = top_recipes.paginate(
         page, app.config['RECIPES_PER_PAGE'], False)
