@@ -6,7 +6,7 @@
         <div class="float-right">
             <small class="card-subtitle badge badge-info">{{ comment.timestamp|timeago }}</small>
         </div>
-        <a href="{{ url_for('recipe', recipe_name=comment.recipe.name, recipe_id=comment.recipe.id, _anchor='comments') }}">
+        <a href="{{ url_for('recipe', recipe_name=comment.recipe.urlify(), recipe_id=comment.recipe.id, _anchor='comments') }}">
             <small>{{ comment.recipe.name }}</small>
         </a>
     </div>
