@@ -9,9 +9,6 @@
     
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="nav navbar-nav mr-auto">
-            <li class="nav-item{% if title == "Home" %} active{% endif %}">
-            <a class="nav-link" href="{{ url_for('index') }}"> <i class="fas fa-home"></i></a>
-            </li>
             {% if not current_user.is_anonymous %}
                 <li class="nav-item{% if title == "Cookbook" %} active{% endif %}">
                 <a class="nav-link" href="{{ url_for('cookbook') }}"><i class="fas fa-book"></i> Cookbook</a>
