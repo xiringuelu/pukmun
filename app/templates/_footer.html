@@ -1,24 +1,12 @@
 <nav class="footer navbar navbar-expand-lg navbar-light bg-light mb-0">
     <div class="container">
-    <div class="navbar-text navbar-left">Pukmun© 2020
-    </div>
-    
-    <div class="btn-toolbar navbar-right">
-        <div class="btn-group mr-1">
-            <a href="#" class="btn btn-primary">
-                <i class="fab fa-facebook"></i></a>
+        <div class="navbar-text navbar-left">Pukmun© 2021
         </div>
-        <div class="btn-group mr-1"> 
-            <a href="#" class="btn-danger btn">
-                <i class="fab fa-youtube"></i> </a>
-        </div>
-        <div class="btn-group mr-1">
-            <a href="#" class="btn-secondary btn">
-                <i class="fab fa-instagram"></i> </a>
-        </div>
-        <div class="btn-group">
-            <a href="#" class="btn-info btn">
-                <i class="fab fa-twitter"></i> </a>
+        
+        <div class="navbar-right">
+            <a href="{{ url_for("privacy") }}"><i class="fas fa-user-secret"></i> Privacy</a>
+            &nbsp;
+            <a href="{{ url_for("legal") }}"><i class="fas fa-balance-scale"></i> Legal Terms</a>
         </div>
     </div>
 </nav>

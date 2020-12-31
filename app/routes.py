@@ -320,6 +320,14 @@ def moderate():
     return render_template('moderate.html', title='Moderation Area',
                                             recipe=recipe, form=form)
 
+@app.route('/privacy', methods=['GET'])
+def privacy():
+    return render_template('privacy.html', title='Privacy Notice')
+
+@app.route('/legal', methods=['GET'])
+def legal():
+    return render_template('legal.html', title='Legal Terms')
+
 @app.route('/see/<notification>', methods=['POST'])
 @login_required
 def see(notification):
