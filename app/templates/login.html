@@ -3,10 +3,10 @@
 
 {% block metas %}
     {{ super() }}
-    <meta property="og:title" content="Log In - Pukmun"/>
-    <meta property="og:description" content="Log in or register an account."/>
-    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}""/>
-    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('login') }}"/>
+        <meta property="og:title" content="Log In - Pukmun"/>
+        <meta property="og:description" content="Log in or register an account."/>
+        <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}""/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('login') }}"/>
 {% endblock %}
 
 {% block app_content %}

@@ -2,6 +2,18 @@
 <html lang="en">
     <head>
         {% block head %}
+        {% if config['GA_KEY'] %}
+        <!-- Google Analytics -->
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+            
+            ga('create', '{{config['GA_KEY']}}', 'auto');
+            ga('send', 'pageview');
+        </script>
+        {% endif %}
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -25,17 +37,15 @@
         <meta name="msapplication-square150x150logo" content="{{ url_for('static', filename='mstile-150x150.png') }}" />
         <meta name="msapplication-wide310x150logo" content="{{ url_for('static', filename='mstile-310x150.png') }}" />
         <meta name="msapplication-square310x310logo" content="{{ url_for('static', filename='mstile-310x310.png') }}" />
-        
         {% block metas %}
         {% endblock %}
-
         {% block styles %}
-            <!-- Bootstrap CSS -->
-            {{ bootstrap.load_css() }}
-            <!-- Font-Awesome CSS -->
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-            <!-- Custom CSS -->
-            <link rel="stylesheet" href="{{ url_for("static", filename="styles.css") }}">
+        <!-- Bootstrap CSS -->
+        {{ bootstrap.load_css() }}
+        <!-- Font-Awesome CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="{{ url_for("static", filename="styles.css") }}">
         {% endblock %}
 
         <title>{% if title %}{{ title }} - Pukmun{% else %}Welcome to Pukmun{% endif %}</title>

@@ -58,3 +58,6 @@ class Config(object):
 
     ### FILE UPLOAD SIZE LIMIT = 5MB
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+
+    ### GOOGLE ANALYTICS
+    GA_KEY = ''

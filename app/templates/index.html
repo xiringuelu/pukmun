@@ -6,18 +6,18 @@
         <meta property="og:title" content="{{ label }}: {{ value }} - Pukmun"/>
         <meta property="og:description" content="{{ label }}: {{ value }}, selection of recipes."/>
         {% if label == "Category" %}
-            <meta property="og:url" content="{{ config['URL_BASE'] + url_for('category', category=value) }}"/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('category', category=value) }}"/>
         {% elif label == "Tag" %}
-            <meta property="og:url" content="{{ config['URL_BASE'] + url_for('tag', tag=value) }}"/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('tag', tag=value) }}"/>
         {% else %}
-            <meta property="og:url" content="{{ config['URL_BASE'] + url_for('search', search=value) }}"/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('search', search=value) }}"/>
         {% endif %}
     {% else %}
         <meta property="og:title" content="Home - Pukmun"/>
         <meta property="og:description" content="Welcome to Pukmun - Explore our selection of recipes."/>
         <meta property="og:url" content="{{ config['URL_BASE'] + url_for('index') }}"/>
     {% endif %}
-    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
+        <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
 {% endblock %}
 
 {% block app_content %}

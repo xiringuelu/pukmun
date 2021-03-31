@@ -3,10 +3,10 @@
 
 {% block metas %}
     {{ super() }}
-    <meta property="og:title" content="{{ recipe.name }} - Pukmun"/>
-    <meta property="og:description" content="{{ clean_desc }}"/>
-    <meta property="og:image" itemprop="image" content="{{ config['URL_BASE'] + url_for('get_img', filename=recipe.image) }}"/>
-    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('recipe', recipe_name=recipe.urlify(), recipe_id=recipe.id) }}"/>
+        <meta property="og:title" content="{{ recipe.name }} - Pukmun"/>
+        <meta property="og:description" content="{{ clean_desc }}"/>
+        <meta property="og:image" itemprop="image" content="{{ config['URL_BASE'] + url_for('get_img', filename=recipe.image) }}"/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('recipe', recipe_name=recipe.urlify(), recipe_id=recipe.id) }}"/>
 {% endblock %}
 
 {% block app_content %}

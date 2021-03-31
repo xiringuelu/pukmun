@@ -2,10 +2,10 @@
 
 {% block metas %}
     {{ super() }}
-    <meta property="og:title" content="{{ user.username }} - Pukmun"/>
-    <meta property="og:description" content="{{ clean_about_me }}"/>
-    <meta property="og:image" itemprop="image" content="{{ config['URL_BASE'] + (user.avatar_l or avatars.default(size='l')) }}"/>
-    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('user', username=user.username.lower()) }}"/>
+        <meta property="og:title" content="{{ user.username }} - Pukmun"/>
+        <meta property="og:description" content="{{ clean_about_me }}"/>
+        <meta property="og:image" itemprop="image" content="{{ config['URL_BASE'] + (user.avatar_l or avatars.default(size='l')) }}"/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('user', username=user.username.lower()) }}"/>
 {% endblock %}
 
 {% block app_content %}

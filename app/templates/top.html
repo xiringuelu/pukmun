@@ -2,8 +2,8 @@
 
 {% block metas %}
     {{ super() }}
-    <meta property="og:title" content="{{ label }} {{ value }} - Pukmun"/>
-    <meta property="og:description" content="{{ label }} {{ value }} - Explore our selection of recipes."/>
+        <meta property="og:title" content="{{ label }} {{ value }} - Pukmun"/>
+        <meta property="og:description" content="{{ label }} {{ value }} - Explore our selection of recipes."/>
     {% if value == 'last 30 days' %}
         <meta property="og:url" content="{{ config['URL_BASE'] + url_for('top_month') }}"/>
     {% elif value == 'last 7 days' %}
@@ -13,7 +13,7 @@
     {% else %}
         <meta property="og:url" content="{{ config['URL_BASE'] + url_for(label.lower()+'_'+value.lower()) }}"/>
     {% endif %}
-    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
+        <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
 {% endblock %}
 
 {% block app_content %}

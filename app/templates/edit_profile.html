@@ -3,10 +3,10 @@
 
 {% block metas %}
     {{ super() }}
-    <meta property="og:title" content="My profile - Pukmun"/>
-    <meta property="og:description" content="Edit your information."/>
-    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}""/>
-    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('edit_profile') }}"/>
+        <meta property="og:title" content="My profile - Pukmun"/>
+        <meta property="og:description" content="Edit your information."/>
+        <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}""/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('edit_profile') }}"/>
 {% endblock %}
 
 {% block app_content %}

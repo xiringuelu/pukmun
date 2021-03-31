@@ -2,10 +2,10 @@
 
 {% block metas %}
     {{ super() }}
-    <meta property="og:title" content="Notifications - Pukmun"/>
-    <meta property="og:description" content="Your notirications."/>
-    <meta property="og:url" content="{{ config['URL_BASE'] + url_for('msg') }}"/>
-    <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
+        <meta property="og:title" content="Notifications - Pukmun"/>
+        <meta property="og:description" content="Your notirications."/>
+        <meta property="og:url" content="{{ config['URL_BASE'] + url_for('msg') }}"/>
+        <meta property="og:image" itemprop="image" content="{{config['URL_BASE'] + '/static/logo.jpg'}}"/>
 {% endblock %}
 
 {% block app_content %}
