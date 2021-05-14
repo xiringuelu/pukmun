@@ -37,34 +37,24 @@
             {% endif %}
         </div>
         <div class="col-xs-12 col-sm-12 col-lg-4 mb-2">
+            <div class="row mb-2">
             {% if user.followers.count() %}
-                <div class="row mb-2">
-                    <div class="col">
-                        <span class="badge badge-primary">Followers</span> <span class="badge badge-secondary">{{ user.followers.count() }}</span>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
+                    <div class="col-sm-12 col-md-6 col-lg-12 mb-2">
+                        <div class="mb-1"><span class="badge badge-primary">Followers</span> <span class="badge badge-secondary">{{ user.followers.count() }}</span></div>
                         {% for follower in user.followers %}
                         <a data-toggle="tooltip" title="{{ follower.username }}" href="{{ url_for('user', username=follower.username.lower()) }}"><img  class='border border-primary rounded-circle' src="{{ follower.avatar_s or avatars.default(size='s') }}" width="30px"></a>
                         {% endfor %}
                     </div>
-                </div>
             {% endif %}
             {% if user.followed.count() %}
-                <div class="row mb-2">
-                    <div class="col">
-                        <span class="badge badge-primary">Following</span> <span class="badge badge-secondary">{{ user.followed.count() }}</span>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
+                    <div class="col-sm-12 col-md-6 col-lg-12">
+                        <div class="mb-1"><span class="badge badge-primary">Following</span> <span class="badge badge-secondary">{{ user.followed.count() }}</span></div>
                         {% for followed in user.followed %}
                             <a data-toggle="tooltip" title="{{ followed.username }}" href="{{ url_for('user', username=followed.username.lower()) }}"><img  class='border border-primary rounded-circle' src="{{ followed.avatar_s or avatars.default(size='s') }}" width="30px"></a>
                         {% endfor %}
                     </div>
-                </div>
             {% endif %}
+            </div>
         </div>
     </div>
     <div class="row" id="user_recipes">
@@ -74,9 +64,11 @@
     </div>
     <hr>
     {% if recipes.items %}
-    {% for recipe in recipes.items %}
-        {% include '_recipe_user.html' %}
-    {% endfor %}
+        <div class="row">
+        {% for recipe in recipes.items %}
+            {% include '_recipe_user.html' %}
+        {% endfor %}
+        </div>
         {% include '_pages_recipes.html' %}
     {% else %}
         {% include '_noresults_user.html' %}

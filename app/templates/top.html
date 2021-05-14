@@ -28,9 +28,11 @@
                 </nav>
             {% endif %}
             {% if recipes.items %}
+                <div class="row">
                 {% for recipe in recipes.items %}
                     {% include '_recipe.html' %}
                 {% endfor %}
+                </div>
                 {% include '_pages_recipes.html' %}
             {% else %}
                 {% include '_noresults_home.html' %}
