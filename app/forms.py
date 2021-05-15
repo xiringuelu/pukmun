@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, IntegerField, FormField, FieldList, HiddenField, SelectField
+from flask_wtf.recaptcha import RecaptchaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp
 from app.models import User, Recipe
 from flask_ckeditor import CKEditorField
@@ -24,6 +25,7 @@ class LoginForm(FlaskForm):
     username_or_email = StringField('Username or E-mail', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
+    recaptcha = RecaptchaField()
     submit = SubmitField('Sign In')
 
 class CommentForm(FlaskForm):
@@ -36,6 +38,7 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=5, max=25, message="Password must be betwen 5 & 25 characters")])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    recaptcha = RecaptchaField()
     submit = SubmitField('Register')
 
     def validate_username(self, username):
