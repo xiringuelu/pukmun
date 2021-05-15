@@ -6,6 +6,7 @@ from app.models import User, Recipe
 from flask_ckeditor import CKEditorField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from flask_login import current_user
+from app import app
 
 class UploadAvatarForm(FlaskForm):
     image = FileField('Select Image (Max. size 3MB)', validators=[
@@ -25,7 +26,8 @@ class LoginForm(FlaskForm):
     username_or_email = StringField('Username or E-mail', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
-    recaptcha = RecaptchaField()
+    if app.config['RECAPTCHA_PUBLIC_KEY']:
+        recaptcha = RecaptchaField()
     submit = SubmitField('Sign In')
 
 class CommentForm(FlaskForm):
@@ -38,7 +40,8 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=5, max=25, message="Password must be betwen 5 & 25 characters")])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    recaptcha = RecaptchaField()
+    if app.config['RECAPTCHA_PUBLIC_KEY']:
+        recaptcha = RecaptchaField()
     submit = SubmitField('Register')
 
     def validate_username(self, username):
