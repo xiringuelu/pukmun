@@ -61,3 +61,7 @@ class Config(object):
 
     ### GOOGLE ANALYTICS
     GA_KEY = ''
+
+    ### RECAPTCHA KEYS
+    RECAPTCHA_PUBLIC_KEY = ''
+    RECAPTCHA_PRIVATE_KEY = ''
